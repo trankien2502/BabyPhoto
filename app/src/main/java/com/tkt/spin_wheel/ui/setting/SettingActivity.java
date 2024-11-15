@@ -30,8 +30,8 @@ public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
     @Override
     public void initView() {
         EventTracking.logEvent(this,"setting_view");
-        binding.headerSetting.tvTitle.setText(R.string.settings);
-        binding.tvLangCurrent.setText(SPUtils.getString(this,SPUtils.LANGUAGE,""));
+        binding.tvTitle.setText(R.string.settings);
+//        binding.tvLangCurrent.setText(SPUtils.getString(this,SPUtils.LANGUAGE,""));
         if (SharePrefUtils.isRated(this)) {
             binding.clRate.setVisibility(View.GONE);
         }
@@ -43,7 +43,7 @@ public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
             EventTracking.logEvent(this,"setting_language_click");
             startNextActivity(LanguageActivity.class,null);
         });
-        binding.headerSetting.ivBack.setOnClickListener(view -> onBackPressed());
+        binding.ivBack.setOnClickListener(view -> onBack());
         binding.clRate.setOnClickListener(view -> onRate());
         binding.clAbout.setOnClickListener(view -> {
             EventTracking.logEvent(this,"setting_about_click");
@@ -51,6 +51,13 @@ public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
         });
         binding.clShare.setOnClickListener(view -> onShare());
     }
+
+    @Override
+    public void onBack() {
+        setResult(RESULT_OK);
+        finish();
+    }
+
     private void onRate() {
         EventTracking.logEvent(this,"setting_rate_us_click");
         RatingDialog ratingDialog = new RatingDialog(SettingActivity.this, true);
@@ -120,11 +127,5 @@ public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
     @Override
     protected void onResume() {
         super.onResume();
-    }
-    @Override
-    public void onBackPressed() {
-        //super.onBackPressed();
-        setResult(RESULT_OK);
-        finish();
     }
 }

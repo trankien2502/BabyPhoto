@@ -53,6 +53,20 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
             startNextActivity(SettingActivity.class,null);
         });
     }
+
+    @Override
+    public void onBack() {
+        if (!SharePrefUtils.isRated(this)) {
+            if (exitRate.contains(String.valueOf(SharePrefUtils.getCountOpenApp(this)))) {
+                rateApp();
+            } else {
+                exitApp();
+            }
+        } else {
+            exitApp();
+        }
+    }
+
     ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode()==RESULT_OK){
             //ads
@@ -139,18 +153,6 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if (!SharePrefUtils.isRated(this)) {
-            if (exitRate.contains(String.valueOf(SharePrefUtils.getCountOpenApp(this)))) {
-                rateApp();
-            } else {
-                exitApp();
-            }
-        } else {
-            exitApp();
-        }
-    }
 
     @Override
     protected void onDestroy() {

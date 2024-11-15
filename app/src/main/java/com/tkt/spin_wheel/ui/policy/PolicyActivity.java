@@ -39,7 +39,12 @@ public class PolicyActivity extends BaseActivity<ActivityPolicyBinding> {
 
     @Override
     public void bindView() {
-        binding.ivGone.setOnClickListener(v -> onBackPressed());
+        binding.ivGone.setOnClickListener(v -> onBack());
+    }
+
+    @Override
+    public void onBack() {
+        finish();
     }
 
 }

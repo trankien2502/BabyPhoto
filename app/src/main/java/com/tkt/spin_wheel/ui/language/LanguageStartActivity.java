@@ -59,6 +59,11 @@ public class LanguageStartActivity extends BaseActivity<ActivityLanguageStartBin
         });
     }
 
+    @Override
+    public void onBack() {
+        finishAffinity();
+    }
+
     private void initData() {
         listLanguage = new ArrayList<>();
         String lang = Locale.getDefault().getLanguage();
@@ -79,8 +84,4 @@ public class LanguageStartActivity extends BaseActivity<ActivityLanguageStartBin
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        finishAffinity();
-    }
 }

@@ -34,8 +34,8 @@ public class LanguageActivity extends BaseActivity<ActivityLanguageBinding> {
     public void initView() {
         initData();
         codeLang = Locale.getDefault().getLanguage();
-        binding.viewTop.ivGone.setVisibility(View.VISIBLE);
-        binding.viewTop.tvTitle.setText(getString(R.string.language));
+        binding.ivGone.setVisibility(View.VISIBLE);
+        binding.tvTitle.setText(getString(R.string.language));
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         LanguageAdapter languageAdapter = new LanguageAdapter(listLanguage, languageModel -> {
@@ -52,13 +52,18 @@ public class LanguageActivity extends BaseActivity<ActivityLanguageBinding> {
 
     @Override
     public void bindView() {
-        binding.viewTop.ivGone.setOnClickListener(view -> {
+        binding.ivGone.setOnClickListener(view -> {
             SystemUtil.saveLocale(getBaseContext(), codeLang);
             SPUtils.setString(this,SPUtils.LANGUAGE,nameLang);
             startNextActivity(HomeActivity.class, null);
             finishAffinity();
         });
-        binding.viewTop.ivBack.setOnClickListener(v -> onBackPressed());
+        binding.ivBack.setOnClickListener(v -> onBack());
+    }
+
+    @Override
+    public void onBack() {
+        finishThisActivity();
     }
 
     private void initData() {
@@ -81,9 +86,4 @@ public class LanguageActivity extends BaseActivity<ActivityLanguageBinding> {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finishThisActivity();
-    }
 }

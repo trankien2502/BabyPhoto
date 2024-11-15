@@ -63,6 +63,12 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
             }
         });
     }
+
+    @Override
+    public void onBack() {
+        finishAffinity();
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private void checkSwStorage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -76,10 +82,4 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
         }
     }
 
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finishAffinity();
-    }
 }

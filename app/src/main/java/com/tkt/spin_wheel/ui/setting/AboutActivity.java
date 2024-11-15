@@ -25,7 +25,7 @@ public class AboutActivity extends BaseActivity<ActivityAboutBinding> {
         SpannableString spannableString = new SpannableString(text);
 
         spannableString.setSpan(new UnderlineSpan(), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        int color = getResources().getColor(R.color.main);// Đặt màu mong muốn ở đây
+        int color = getResources().getColor(R.color.main);
         spannableString.setSpan(new ForegroundColorSpan(color), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         binding.privacy.setText(spannableString);
     }
@@ -35,6 +35,11 @@ public class AboutActivity extends BaseActivity<ActivityAboutBinding> {
         binding.privacy.setOnClickListener(view -> {
             startNextActivity(PolicyActivity.class, null);
         });
-        binding.ivGone.setOnClickListener(view -> onBackPressed());
+        binding.ivGone.setOnClickListener(view -> onBack());
+    }
+
+    @Override
+    public void onBack() {
+        finish();
     }
 }

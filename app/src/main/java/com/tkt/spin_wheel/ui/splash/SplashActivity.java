@@ -34,6 +34,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBack() {
+
     }
 }
