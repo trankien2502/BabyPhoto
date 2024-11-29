@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -46,9 +47,9 @@ public class LanguageStartAdapter extends RecyclerView.Adapter<LanguageStartAdap
         }
         holder.tvLang.setText(languageModel.getName());
         if (languageModel.getActive()) {
-            holder.ivBackgroundLang.setImageResource(R.drawable.bg_lang_item_s);
+            holder.layoutItem.setBackgroundResource(R.drawable.bg_lang_item_s);
         } else {
-            holder.ivBackgroundLang.setImageResource(R.drawable.bg_lang_item_sn);
+            holder.layoutItem.setBackgroundResource(R.drawable.bg_lang_item_sn);
         }
 
         switch (languageModel.getCode()) {
@@ -96,14 +97,12 @@ public class LanguageStartAdapter extends RecyclerView.Adapter<LanguageStartAdap
     }
 
     public static class LanguageViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView ivBackgroundLang;
         private final TextView tvLang;
         private final ImageView icLang;
-        private final LinearLayout layoutItem;
+        private final ConstraintLayout layoutItem;
 
         public LanguageViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivBackgroundLang = itemView.findViewById(R.id.ivBackgroundLang);
             icLang = itemView.findViewById(R.id.icLang);
             tvLang = itemView.findViewById(R.id.tvLang);
             layoutItem = itemView.findViewById(R.id.layoutItem);

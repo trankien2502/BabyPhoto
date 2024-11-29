@@ -9,12 +9,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.tkt.spin_wheel.R;
 import com.tkt.spin_wheel.ui.language.interfaces.IClickLanguage;
 import com.tkt.spin_wheel.ui.language.model.LanguageModel;
-import com.tkt.spin_wheel.R;
 
 import java.util.List;
 
@@ -45,9 +46,9 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.Langug
             return;
         }
         if (languageModel.getActive()) {
-            holder.ivBackgroundLang.setImageResource(R.drawable.bg_lang_item_s2);
+            holder.layoutItem.setBackgroundResource(R.drawable.bg_lang_item_s2);
         } else {
-            holder.ivBackgroundLang.setImageResource(R.drawable.bg_lang_item_sn);
+            holder.layoutItem.setBackgroundResource(R.drawable.bg_lang_item_sn);
         }
         holder.tvLang.setText(languageModel.getName());
         switch (languageModel.getCode()) {
@@ -96,16 +97,14 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.Langug
 
     public static class LangugeViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvLang;
-        private final LinearLayout layoutItem;
+        private final ConstraintLayout layoutItem;
         private final ImageView icLang;
-        private final ImageView ivBackgroundLang;
 
         public LangugeViewHolder(@NonNull View itemView) {
             super(itemView);
             icLang = itemView.findViewById(R.id.icLang);
             tvLang = itemView.findViewById(R.id.tvLang);
             layoutItem = itemView.findViewById(R.id.layoutItem);
-            ivBackgroundLang = itemView.findViewById(R.id.ivBackgroundLang);
         }
     }
 

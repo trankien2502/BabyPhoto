@@ -4,16 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F9FAFB">
+    android:background="@drawable/bg_splash">
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/view_pager2"
-        android:layout_width="0dp"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/tvIntro"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/viewHeight"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <TextView
         android:id="@+id/tvIntro"
@@ -25,10 +35,10 @@
         android:gravity="center"
         android:includeFontPadding="false"
         android:lineSpacingExtra="0dp"
-        android:lines="2"
+        android:lines="1"
         android:text="@string/intro_3"
-        android:textColor="#111827"
-        android:textSize="19sp"
+        android:textColor="#FFBF44"
+        android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/tvIntroContent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,13 +51,14 @@
         android:layout_marginHorizontal="16dp"
         android:ellipsize="end"
         android:fontFamily="@font/be_vietnam_pro"
-        android:gravity="center_horizontal"
+        android:gravity="center"
         android:includeFontPadding="false"
         android:lineSpacingExtra="0dp"
         android:lines="3"
-        android:textColor="#4B5563"
+        android:text="@string/content_intro_1"
+        android:textColor="#e6e6e6"
         android:textSize="16sp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/rl_bottom3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -85,7 +96,7 @@
                 android:id="@+id/circle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
+                android:layout_marginStart="8dp"
                 android:src="@drawable/ic_intro_sn"
                 tools:ignore="ContentDescription" />
 
@@ -93,8 +104,16 @@
                 android:id="@+id/circle3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_intro_s"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_intro_sn"
                 tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:id="@+id/circle4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8sp"
+                android:src="@drawable/ic_intro_s" />
         </LinearLayout>
 
         <TextView
@@ -107,7 +126,7 @@
             android:minWidth="48dp"
             android:minHeight="48dp"
             android:text="@string/next"
-            android:textColor="#F1451F"
+            android:textColor="#FFDF3D"
             android:textSize="16sp"
             android:textStyle="bold"
             android:visibility="visible" />
@@ -123,41 +142,40 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clNext"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_margin="@dimen/_12sdp"
+        <RelativeLayout
+            android:id="@+id/nativeIntro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <ImageView
-                android:id="@+id/ivNext"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/bg_button_next"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/btn_next"
+            <FrameLayout
+                android:id="@+id/fr_ads_intro"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/be_vietnam_pro"
-                android:gravity="center"
-                android:text="@string/next"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="normal"
-                app:layout_constraintBottom_toBottomOf="@id/ivNext"
-                app:layout_constraintEnd_toEndOf="@id/ivNext"
-                app:layout_constraintStart_toStartOf="@id/ivNext"
-                app:layout_constraintTop_toTopOf="@id/ivNext" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:visibility="visible">
 
+<!--                <include layout="@layout/layout_native_load_small" />-->
+            </FrameLayout>
+        </RelativeLayout>
 
+        <TextView
+            android:id="@+id/btn_next"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_margin="@dimen/_12sdp"
+            android:background="@drawable/bg_button_next"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:text="@string/next2"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

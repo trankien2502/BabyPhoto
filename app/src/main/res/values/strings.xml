@@ -53,5 +53,6 @@
     <string name="permission">Permission</string>
     <string name="this_app_needs_permissions_below_to_work_properly">This app needs permissions below to work properly</string>
     <string name="overlay_draw">Overlay Draw</string>
+    <string name="next2">NEXT</string>
 
 </resources>
