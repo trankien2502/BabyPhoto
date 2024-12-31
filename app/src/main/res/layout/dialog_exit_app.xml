@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/_20sdp"
-        android:background="@drawable/bg_view_c15"
+        android:background="@drawable/bg_dialog_2"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/_12sdp"
@@ -19,7 +19,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:fontFamily="@font/bowlby_one_sc"
+            android:fontFamily="@font/svn_gilroy"
+            android:textStyle="bold"
             android:includeFontPadding="false"
             android:singleLine="true"
             android:text="@string/quit"
@@ -38,64 +39,48 @@
             android:textColor="@color/black"
             android:textSize="@dimen/_11ssp" />
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_12sdp"
-            android:layout_marginTop="@dimen/_28sdp">
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
 
-            <View
-                android:id="@+id/view_center"
-                android:layout_width="1dp"
-                android:layout_height="1dp"
-                android:layout_centerInParent="true"
-                android:layout_marginHorizontal="@dimen/_6sdp" />
-
-            <RelativeLayout
-                android:id="@+id/btn_cancel_quit_app"
+            <TextView
+                android:id="@+id/btnDeny"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/view_center"
-                android:background="@drawable/bg_view_32">
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_camera_access_deny"
+                android:ellipsize="end"
+                android:fontFamily="@font/svn_gilroy"
+                android:gravity="center"
+                android:lines="1"
+                android:minHeight="48dp"
+                android:paddingHorizontal="12dp"
+                android:text="@string/cancel"
+                android:textColor="@color/line"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_marginVertical="@dimen/_8sdp"
-                    android:ellipsize="end"
-                    android:includeFontPadding="false"
-                    android:singleLine="true"
-                    android:text="@string/cancel"
-                    android:fontFamily="@font/svn_gilroy"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_10ssp" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/btn_quit_app"
+            <TextView
+                android:id="@+id/btnAllow"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_toEndOf="@+id/view_center"
-                android:backgroundTint="#35cc00"
-                android:background="@drawable/bg_view_32">
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_camera_access_allow"
+                android:ellipsize="end"
+                android:fontFamily="@font/svn_gilroy"
+                android:gravity="center"
+                android:lines="1"
+                android:paddingHorizontal="12dp"
+                android:text="@string/quit"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_marginVertical="@dimen/_8sdp"
-                    android:ellipsize="end"
-                    android:includeFontPadding="false"
-                    android:fontFamily="@font/svn_gilroy"
-                    android:singleLine="true"
-                    android:text="@string/quit"
-                    android:textColor="#FCFCFC"
-                    android:textSize="@dimen/_10ssp" />
-            </RelativeLayout>
-        </RelativeLayout>
+        </LinearLayout>
 
     </LinearLayout>
 
