@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Metal 2</string>
+    <string name="app_name" translatable="false">Measure Ruler</string>
 
     <string name="english" translatable="false">English</string>
     <string name="french" translatable="false">French</string>
@@ -54,5 +54,11 @@
     <string name="this_app_needs_permissions_below_to_work_properly">This app needs permissions below to work properly</string>
     <string name="overlay_draw">Overlay Draw</string>
     <string name="next2">NEXT</string>
+    <string name="title_dialog_per">Grant these permissions to use <b>\"M123455\"</b></string>
+    <string name="content_dialog_per_noti">Note: You can also grant permission in <b>Settings -> Apps -> M123455 -> Notifications </b></string>
+    <string name="content_dialog_per_storage">Note: You can also grant permission in <b>Settings -> Apps -> M123455 -> Storage </b></string>
+    <string name="content_dialog_per_overlay">Note: You can also grant permission in <b>Settings -> Display over other Apps -> M123455</b></string>
+    <string name="go_to_setting">Go to Settings</string>
+
 
 </resources>
