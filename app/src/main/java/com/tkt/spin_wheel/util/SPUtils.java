@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 public class SPUtils {
     public static final String SHARED_PREFS_NAME = "GHOST_DETECTOR";
     public static String CAMERA = "CAMERA";
-    public static String MICRO = "MICRO";
+    public static String NOTIFICATION = "NOTIFICATION";
     public static String LANGUAGE = "LANGUAGE";
     public static String SOUND_GHOST_SCAN = "SOUND_GHOST_SCAN";
     public static String SOUND_CHALLENGE = "SOUND_CHALLENGE";

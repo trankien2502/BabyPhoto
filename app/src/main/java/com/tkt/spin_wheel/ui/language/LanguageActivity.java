@@ -4,16 +4,14 @@ import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-
+import com.tkt.spin_wheel.R;
 import com.tkt.spin_wheel.base.BaseActivity;
+import com.tkt.spin_wheel.databinding.ActivityLanguageBinding;
 import com.tkt.spin_wheel.ui.home.HomeActivity;
 import com.tkt.spin_wheel.ui.language.adapter.LanguageAdapter;
-import com.tkt.spin_wheel.ui.language.adapter.LanguageStartAdapter;
 import com.tkt.spin_wheel.ui.language.model.LanguageModel;
 import com.tkt.spin_wheel.util.SPUtils;
 import com.tkt.spin_wheel.util.SystemUtil;
-import com.tkt.spin_wheel.R;
-import com.tkt.spin_wheel.databinding.ActivityLanguageBinding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +34,7 @@ public class LanguageActivity extends BaseActivity<ActivityLanguageBinding> {
         codeLang = Locale.getDefault().getLanguage();
         binding.ivGone.setVisibility(View.VISIBLE);
         binding.tvTitle.setText(getString(R.string.language));
-
+        nameLang = SPUtils.getString(this, SPUtils.LANGUAGE, "");
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         LanguageAdapter languageAdapter = new LanguageAdapter(listLanguage, languageModel -> {
             codeLang = languageModel.getCode();
@@ -54,7 +52,7 @@ public class LanguageActivity extends BaseActivity<ActivityLanguageBinding> {
     public void bindView() {
         binding.ivGone.setOnClickListener(view -> {
             SystemUtil.saveLocale(getBaseContext(), codeLang);
-            SPUtils.setString(this,SPUtils.LANGUAGE,nameLang);
+            SPUtils.setString(this, SPUtils.LANGUAGE, nameLang);
             startNextActivity(HomeActivity.class, null);
             finishAffinity();
         });

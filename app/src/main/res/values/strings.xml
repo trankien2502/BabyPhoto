@@ -30,7 +30,7 @@
     <string name="request">Request or feedback</string>
     <string name="send_email">Send by email&#8230;</string>
     <string name="email_clients_not_found">Not found any Email client</string>
-    <string name="version">Version 1.0.0</string>
+    <string name="version">Version</string>
     <string name="next">Next</string>
     <string name="quit">Quit</string>
     <string name="cancel">Cancel</string>
@@ -51,14 +51,18 @@
     <string name="content_intro_2">Choose your zip and row from our collection</string>
     <string name="get_started">Get started</string>
     <string name="permission">Permission</string>
-    <string name="this_app_needs_permissions_below_to_work_properly">This app needs permissions below to work properly</string>
+    <string name="this_app_needs_permissions_below_to_work_properly">This app requires the following permissions to provide services for you:</string>
     <string name="overlay_draw">Overlay Draw</string>
     <string name="next2">NEXT</string>
     <string name="title_dialog_per">Grant these permissions to use <b>\"M123455\"</b></string>
     <string name="content_dialog_per_noti">Note: You can also grant permission in <b>Settings -> Apps -> M123455 -> Notifications </b></string>
-    <string name="content_dialog_per_storage">Note: You can also grant permission in <b>Settings -> Apps -> M123455 -> Storage </b></string>
+    <string name="content_dialog_per_camera">Note: You can also grant permission in <b>Settings -> Apps -> M123455 -> Camera </b></string>
     <string name="content_dialog_per_overlay">Note: You can also grant permission in <b>Settings -> Display over other Apps -> M123455</b></string>
     <string name="go_to_setting">Go to Settings</string>
+    <string name="choose_language">Choose Language</string>
+    <string name="notification">Notification</string>
+    <string name="agree_and_continue">Agree and Continue</string>
+    <string name="camera">Camera</string>
 
 
 </resources>

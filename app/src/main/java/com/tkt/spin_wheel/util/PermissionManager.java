@@ -43,7 +43,7 @@ public class PermissionManager {
         } else return true;
     }
 
-    private boolean checkCameraPermission(Context context) {
+    public static boolean checkCameraPermission(Context context) {
         return ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED;
     }

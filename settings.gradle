@@ -1,2 +1,2 @@
-rootProject.name = "Metal 2"
+rootProject.name = "Measure Ruler"
 include ':app'

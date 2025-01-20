@@ -16,25 +16,23 @@
 
         <TextView
             android:id="@+id/tvTitle"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_12sdp"
-            android:fontFamily="@font/be_vietnam_pro"
-            android:gravity="center"
+            android:fontFamily="@font/svn_gilroy"
             android:text="@string/about"
-            android:textColor="#111827"
-            android:textSize="22sp"
+            android:textColor="#000000"
+            android:textSize="24sp"
             android:textStyle="bold"
-            android:includeFontPadding="false"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivGone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
         <ImageView
             android:id="@+id/ivGone"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="16dp"
             android:padding="12dp"
             android:src="@drawable/img_back"
             android:visibility="visible"
@@ -62,9 +60,9 @@
         android:layout_marginTop="24dp"
         android:textStyle="normal"
         android:text="@string/version"
-        android:textSize="16sp"
-        android:textColor="#111827"
-        android:fontFamily="@font/be_vietnam_pro"/>
+        android:textSize="18sp"
+        android:textColor="#000000"
+        android:fontFamily="@font/sf_pro_text_medium"/>
     <TextView
         android:id="@+id/privacy"
         android:layout_width="wrap_content"
@@ -77,8 +75,8 @@
         android:minHeight="48dp"
         android:minWidth="48dp"
         android:text="@string/privacy_policy"
-        android:textSize="16sp"
-        android:textColor="#111827"
+        android:textSize="20sp"
+        android:textColor="#0256FF"
         android:fontFamily="@font/be_vietnam_pro"/>
 
 
