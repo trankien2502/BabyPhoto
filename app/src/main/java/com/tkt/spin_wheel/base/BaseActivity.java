@@ -1,13 +1,11 @@
 package com.tkt.spin_wheel.base;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -23,8 +21,9 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.viewbinding.ViewBinding;
 
 import com.tkt.spin_wheel.R;
-import com.tkt.spin_wheel.ui.home.album.DesignActivity;
+import com.tkt.spin_wheel.dialog.LoadingDialog;
 import com.tkt.spin_wheel.util.SystemUtil;
+import com.tkt.spin_wheel.ui.intro.IntroActivity;
 
 import java.util.Objects;
 
@@ -41,7 +40,7 @@ public abstract class BaseActivity<VB extends ViewBinding> extends AppCompatActi
     public abstract void onBack();
 
     Animation animation;
-    AlertDialog alertDialog;
+    LoadingDialog alertDialog;
 
 
     @Override
@@ -75,7 +74,7 @@ public abstract class BaseActivity<VB extends ViewBinding> extends AppCompatActi
                 onBack();
             }
         });
-        if (!(this instanceof DesignActivity)) {
+        if (!(this instanceof IntroActivity)) {
             binding.getRoot().setPadding(
                     binding.getRoot().getPaddingLeft(),
                     binding.getRoot().getPaddingTop() + getStatusBarHeight(),
@@ -113,14 +112,7 @@ public abstract class BaseActivity<VB extends ViewBinding> extends AppCompatActi
     }
 
     private void createLoadingDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_loading, null);
-        builder.setView(dialogView);
-        builder.setCancelable(false);
-
-        alertDialog = builder.create();
-
+        alertDialog = new LoadingDialog(this, false);
     }
 
     public void showLoadingDialog() {
@@ -153,8 +145,7 @@ public abstract class BaseActivity<VB extends ViewBinding> extends AppCompatActi
     @Override
     protected void onResume() {
         super.onResume();
-        //tắt ads resume all
-//        if (RemoteConfig.remote_resume) {
+//        if (ConstantRemote.open_resume && CheckAds.getInstance().isShowAds(this)) {
 //            AppOpenManager.getInstance().enableAppResumeWithActivity(getClass());
 //        } else {
 //            AppOpenManager.getInstance().disableAppResumeWithActivity(getClass());
