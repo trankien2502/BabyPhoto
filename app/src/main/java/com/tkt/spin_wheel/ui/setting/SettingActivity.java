@@ -5,19 +5,19 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
+import com.tkt.spin_wheel.R;
 import com.tkt.spin_wheel.base.BaseActivity;
+import com.tkt.spin_wheel.databinding.ActivitySettingBinding;
 import com.tkt.spin_wheel.dialog.rate.IClickDialogRate;
 import com.tkt.spin_wheel.dialog.rate.RatingDialog;
 import com.tkt.spin_wheel.ui.language.LanguageActivity;
 import com.tkt.spin_wheel.util.EventTracking;
 import com.tkt.spin_wheel.util.SPUtils;
 import com.tkt.spin_wheel.util.SharePrefUtils;
-import com.tkt.spin_wheel.R;
-import com.tkt.spin_wheel.databinding.ActivitySettingBinding;
-import com.google.android.gms.tasks.Task;
-import com.google.android.play.core.review.ReviewInfo;
-import com.google.android.play.core.review.ReviewManager;
-import com.google.android.play.core.review.ReviewManagerFactory;
 
 public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
 
@@ -29,9 +29,9 @@ public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
 
     @Override
     public void initView() {
-        EventTracking.logEvent(this,"setting_view");
+        EventTracking.logEvent(this, "setting_view");
         binding.tvTitle.setText(R.string.settings);
-//        binding.tvLangCurrent.setText(SPUtils.getString(this,SPUtils.LANGUAGE,""));
+        binding.tvLangCurrent.setText(SPUtils.getString(this, SPUtils.LANGUAGE, ""));
         if (SharePrefUtils.isRated(this)) {
             binding.clRate.setVisibility(View.GONE);
         }
@@ -40,14 +40,14 @@ public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
     @Override
     public void bindView() {
         binding.clLanguage.setOnClickListener(view -> {
-            EventTracking.logEvent(this,"setting_language_click");
-            startNextActivity(LanguageActivity.class,null);
+            EventTracking.logEvent(this, "setting_language_click");
+            startNextActivity(LanguageActivity.class, null);
         });
         binding.ivBack.setOnClickListener(view -> onBack());
         binding.clRate.setOnClickListener(view -> onRate());
         binding.clAbout.setOnClickListener(view -> {
-            EventTracking.logEvent(this,"setting_about_click");
-            startNextActivity(AboutActivity.class,null);
+            EventTracking.logEvent(this, "setting_about_click");
+            startNextActivity(AboutActivity.class, null);
         });
         binding.clShare.setOnClickListener(view -> onShare());
     }
@@ -59,7 +59,7 @@ public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
     }
 
     private void onRate() {
-        EventTracking.logEvent(this,"setting_rate_us_click");
+        EventTracking.logEvent(this, "setting_rate_us_click");
         RatingDialog ratingDialog = new RatingDialog(SettingActivity.this, true);
         ratingDialog.init(new IClickDialogRate() {
             @Override
@@ -72,8 +72,8 @@ public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
                 sendIntent.setData(uri);
                 try {
                     startActivity(Intent.createChooser(sendIntent, getString(R.string.Send_Email)));
-                    int star = SPUtils.getInt(SettingActivity.this,SPUtils.RATE_STAR,0);
-                    EventTracking.logEvent(SettingActivity.this,"rate_submit","rate_star"+star,String.valueOf(star));
+                    int star = SPUtils.getInt(SettingActivity.this, SPUtils.RATE_STAR, 0);
+                    EventTracking.logEvent(SettingActivity.this, "rate_submit", "rate_star" + star, String.valueOf(star));
                     //AppOpenManager.getInstance().disableAppResumeWithActivity(SettingActivity.class);
                     SharePrefUtils.forceRated(SettingActivity.this);
                 } catch (android.content.ActivityNotFoundException ex) {
@@ -83,7 +83,7 @@ public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
 
             @Override
             public void rate() {
-                EventTracking.logEvent(SettingActivity.this,"rate_submit");
+                EventTracking.logEvent(SettingActivity.this, "rate_submit");
                 ReviewManager manager = ReviewManagerFactory.create(SettingActivity.this);
                 Task<ReviewInfo> request = manager.requestReviewFlow();
                 request.addOnCompleteListener(task -> {
@@ -91,8 +91,8 @@ public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
                         ReviewInfo reviewInfo = task.getResult();
                         Task<Void> flow = manager.launchReviewFlow(SettingActivity.this, reviewInfo);
                         flow.addOnSuccessListener(result -> {
-                            int star = SPUtils.getInt(SettingActivity.this,SPUtils.RATE_STAR,0);
-                            EventTracking.logEvent(SettingActivity.this,"rate_submit","rate_star"+star,String.valueOf(star));
+                            int star = SPUtils.getInt(SettingActivity.this, SPUtils.RATE_STAR, 0);
+                            EventTracking.logEvent(SettingActivity.this, "rate_submit", "rate_star" + star, String.valueOf(star));
                             binding.clRate.setVisibility(View.GONE);
                             SharePrefUtils.forceRated(SettingActivity.this);
                             ratingDialog.dismiss();
@@ -105,17 +105,17 @@ public class SettingActivity extends BaseActivity<ActivitySettingBinding> {
 
             @Override
             public void later() {
-                EventTracking.logEvent(SettingActivity.this,"rate_not_now");
+                EventTracking.logEvent(SettingActivity.this, "rate_not_now");
                 ratingDialog.dismiss();
             }
 
         });
         ratingDialog.show();
-        EventTracking.logEvent(this,"rate_show");
+        EventTracking.logEvent(this, "rate_show");
     }
 
     private void onShare() {
-        EventTracking.logEvent(this,"setting_share_click");
+        EventTracking.logEvent(this, "setting_share_click");
         Intent intentShare = new Intent(Intent.ACTION_SEND);
         intentShare.setType("text/plain");
         intentShare.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));

@@ -1,5 +1,6 @@
 package com.tkt.spin_wheel.ui.setting;
 
+import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -25,7 +26,7 @@ public class AboutActivity extends BaseActivity<ActivityAboutBinding> {
         SpannableString spannableString = new SpannableString(text);
 
         spannableString.setSpan(new UnderlineSpan(), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        int color = getResources().getColor(R.color.main);
+        int color = Color.parseColor("#0256FF");
         spannableString.setSpan(new ForegroundColorSpan(color), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         binding.privacy.setText(spannableString);
     }

@@ -63,7 +63,7 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
         binding.swPer.setOnClickListener(view -> {
             if (!PermissionManager.checkCameraPermission(this)) {
                 EventTracking.logEvent(this, "permission_allow_click");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_CAMERA_PERMISSION);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_CAMERA_PERMISSION);
             }
         });
     }
@@ -85,7 +85,7 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 checkSwCamera();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (!shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                         countCamera++;
 //                        AppOpenManager.getInstance().disableAppResumeWithActivity(PermissionActivity.class);
                         SPUtils.setInt(this, SPUtils.CAMERA, countCamera);
