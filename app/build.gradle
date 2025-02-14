@@ -18,7 +18,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true // ADD THIS LINE
         def formattedDate = new Date().format('MMM.dd.yyyy')
-        archivesBaseName = "Metal2_v${versionName}(${versionCode})_${formattedDate}"
+        archivesBaseName = "Baby Photo 3_v${versionName}(${versionCode})_${formattedDate}"
     }
 
     bundle {
@@ -32,7 +32,26 @@ android {
             enableSplit false
         }
     }
+    flavorDimensions "default"
+    productFlavors {
+        appDeug{
+            manifestPlaceholders = [app_id: "ca-app-pub-3940256099942544~3347511713"]
+            buildConfigField "String", "open_splash", "\"ca-app-pub-3940256099942544/9257395921\""
+            buildConfigField "String", "inter_splash", "\"ca-app-pub-3940256099942544/1033173712\""
+            buildConfigField "String", "banner_splash", "\"ca-app-pub-3940256099942544/6300978111\""
+            buildConfigField "String", "native_language", "\"ca-app-pub-3940256099942544/2247696110\""
+            buildConfigField "String", "banner_collapsible", "\"ca-app-pub-3940256099942544/2014213617\""
+            buildConfigField "String", "resume", "\"ca-app-pub-3940256099942544/9257395921\""
 
+            buildConfigField "Boolean", "build_debug", "true"
+        }
+
+        appRelease{
+            manifestPlaceholders = [app_id: "ca-app-pub-6263349256068158~5615734892"]
+            
+            buildConfigField "Boolean", "build_debug", "false"
+        }
+    }
     buildTypes {
         release {
             debuggable false

@@ -4,17 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class SPUtils {
-    public static final String SHARED_PREFS_NAME = "GHOST_DETECTOR";
+    public static final String SHARED_PREFS_NAME = "BaseJava";
     public static String CAMERA = "CAMERA";
     public static String NOTIFICATION = "NOTIFICATION";
     public static String LANGUAGE = "LANGUAGE";
-    public static String SOUND_GHOST_SCAN = "SOUND_GHOST_SCAN";
-    public static String SOUND_CHALLENGE = "SOUND_CHALLENGE";
-    public static String GHOST_TYPE = "GHOST_TYPE";
-    public static String SCARY_STORIES = "SCARY_STORIES";
-    public static String GHOST_ID = "GHOST_ID";
-    public static String SOUND_POSITION = "SOUND_POSITION";
-    public static String SOUND_CHECK = "SOUND_CHECK";
     public static String RATE_STAR = "RATE_STAR";
 
 

@@ -20,7 +20,6 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     @Override
     public void initView() {
         SharePrefUtils.increaseCountOpenApp(this);
-        SPUtils.setInt(this,SPUtils.GHOST_TYPE,0);
         new Handler().postDelayed(() -> {
             startNextActivity(LanguageStartActivity.class, null);
             finishAffinity();

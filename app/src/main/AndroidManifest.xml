@@ -19,7 +19,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/img_logo"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Ghost_detector"
+        android:theme="@style/Theme.BaseJava"
         tools:targetApi="n">
 
         <!--        android:supportsRtl="true"-->

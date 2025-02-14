@@ -6,7 +6,7 @@ import android.preference.PreferenceManager;
 
 public class SharePrefUtils {
     public static String email = "abcd@gmail.com";
-    public static String subject = "Ghost Detector";
+    public static String subject = "BaseJava";
     private static SharedPreferences mSharePref;
 
     public static void init(Context context) {
@@ -59,18 +59,6 @@ public class SharePrefUtils {
         return true;
     }
 
-    public static void increaseCountFirstHelp(Context context) {
-        SharedPreferences pre = context.getSharedPreferences("dataAudio", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pre.edit();
-        editor.putInt("first", pre.getInt("first", 0) + 1);
-        editor.apply();
-    }
-
-    public static int getCountOpenFirstHelp(Context context) {
-        SharedPreferences pre = context.getSharedPreferences("dataAudio", Context.MODE_PRIVATE);
-        return pre.getInt("first", 0);
-    }
-
     public static boolean isRated(Context context) {
         SharedPreferences pre = context.getSharedPreferences("data", Context.MODE_PRIVATE);
         return pre.getBoolean("rated", false);
@@ -85,28 +73,6 @@ public class SharePrefUtils {
         SharedPreferences pre = context.getSharedPreferences("data", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pre.edit();
         editor.putInt("counts", pre.getInt("counts", 0) + 1);
-        editor.commit();
-    }
-    public static int getCountOpenChallenge(Context context) {
-        SharedPreferences pre = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-        return pre.getInt("counts_challenge", 1);
-    }
-
-    public static void increaseCountOpenChallenge(Context context) {
-        SharedPreferences pre = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pre.edit();
-        editor.putInt("counts_challenge", pre.getInt("counts_challenge", 0) + 1);
-        editor.commit();
-    }
-    public static int getCountOpenGhost(Context context) {
-        SharedPreferences pre = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-        return pre.getInt("counts_ghost", 1);
-    }
-
-    public static void increaseCountOpenGhost(Context context) {
-        SharedPreferences pre = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pre.edit();
-        editor.putInt("counts_ghost", pre.getInt("counts_ghost", 0) + 1);
         editor.commit();
     }
 
