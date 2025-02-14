@@ -44,6 +44,12 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
 
     @Override
     public void initView() {
+        binding.clView.setPadding(
+                binding.clView.getPaddingLeft(),
+                binding.clView.getPaddingTop() + getStatusBarHeight(),
+                binding.clView.getPaddingRight(),
+                binding.clView.getPaddingBottom()
+        );
         EventTracking.logEvent(this,"home_view");
     }
 

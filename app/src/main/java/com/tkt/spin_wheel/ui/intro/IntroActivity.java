@@ -21,7 +21,6 @@ public class IntroActivity extends BaseActivity<ActivityIntroBinding> {
     ImageView[] dots = null;
     int positionPage = 0;
     String[] title;
-    String[] content;
     private boolean isStartActivity = true;
     List<Integer> listImage;
     SlideAdapter adapter;
@@ -36,25 +35,12 @@ public class IntroActivity extends BaseActivity<ActivityIntroBinding> {
     public void initView() {
         EventTracking.logEvent(IntroActivity.this, "Intro1_view");
         listImage = new ArrayList<>();
-//        if (IsNetWork.haveNetworkConnection(this) && !ConstantIdAds.listIDAdsNativeIntroFull.isEmpty() && ConstantRemote.native_intro_full && CheckAds.getInstance().isShowAds(getBaseContext())) {
-//            binding.circle4.setVisibility(View.VISIBLE);
-//            listImage.add(R.drawable.img_intro_1);
-//            listImage.add(R.drawable.img_intro_2);
-//            listImage.add(R.drawable.img_intro_3);
-//            listImage.add(R.drawable.img_intro_3);
-//            dots = new ImageView[]{findViewById(R.id.circle1), findViewById(R.id.circle2), findViewById(R.id.circle3), findViewById(R.id.circle4)};
-//            title = new String[]{getResources().getString(R.string.intro_1), getResources().getString(R.string.intro_2), getResources().getString(R.string.intro_3), getResources().getString(R.string.intro_3)};
-//            content = new String[]{getResources().getString(R.string.content_intro_1), getResources().getString(R.string.content_intro_2), getResources().getString(R.string.content_intro_3), getResources().getString(R.string.content_intro_3)};
-//        } else {
-//
-//        }
         binding.circle4.setVisibility(View.GONE);
         listImage.add(R.drawable.img_intro_1);
         listImage.add(R.drawable.img_intro_2);
         listImage.add(R.drawable.img_intro_3);
         dots = new ImageView[]{findViewById(R.id.circle1), findViewById(R.id.circle2), findViewById(R.id.circle3)};
         title = new String[]{getResources().getString(R.string.intro_1), getResources().getString(R.string.intro_2), getResources().getString(R.string.intro_3)};
-        content = new String[]{getResources().getString(R.string.content_intro_1), getResources().getString(R.string.content_intro_2), getResources().getString(R.string.content_intro_3)};
         binding.viewHeight.post(() -> {
             height = binding.viewHeight.getHeight();
             Log.d("intro_check", "Chiều cao của viewHeight: " + height);
@@ -74,45 +60,12 @@ public class IntroActivity extends BaseActivity<ActivityIntroBinding> {
                             adapter.setList(listImage);
                         }
                     }
-//                    if (IsNetWork.haveNetworkConnection(IntroActivity.this) && !ConstantIdAds.listIDAdsNativeIntroFull.isEmpty() && ConstantRemote.native_intro_full && CheckAds.getInstance().isShowAds(getBaseContext())) {
-//                        if (position == 2 || (position == 1 && positionOffset > 0)) {
-//                            binding.nativeIntro.setVisibility(View.INVISIBLE);
-//                            binding.tvIntro.setVisibility(View.GONE);
-//                            binding.tvIntroContent.setVisibility(View.GONE);
-//                            binding.rlBottom3.setVisibility(View.GONE);
-//                        } else {
-//                            if ((position == 0 && positionOffset > 0) || position == 1) {
-//                                binding.nativeIntro.setVisibility(View.INVISIBLE);
-//                            } else {
-//                                if (IsNetWork.haveNetworkConnection(IntroActivity.this) && !ConstantIdAds.listIDAdsNativeIntro.isEmpty() && ConstantRemote.inter_intro && CheckAds.getInstance().isShowAds(getBaseContext())) {
-//                                    binding.nativeIntro.setVisibility(View.VISIBLE);
-//                                } else {
-//                                    binding.nativeIntro.setVisibility(View.INVISIBLE);
-//                                }
-//                            }
-//                            binding.tvIntro.setVisibility(View.VISIBLE);
-//                            binding.tvIntroContent.setVisibility(View.VISIBLE);
-//                            binding.rlBottom3.setVisibility(View.VISIBLE);
-//                        }
-//                    }
-
                 }
 
                 @Override
                 public void onPageSelected(int position) {
                     super.onPageSelected(position);
                     changeContentInit(position);
-//                    if (IsNetWork.haveNetworkConnection(IntroActivity.this) && !ConstantIdAds.listIDAdsNativeIntroFull.isEmpty() && ConstantRemote.native_intro_full && CheckAds.getInstance().isShowAds(getBaseContext())) {
-//                        if (position == 0) {
-//                            EventTracking.logEvent(IntroActivity.this, "Intro1_view");
-//                        } else if (position == 1) {
-//                            EventTracking.logEvent(IntroActivity.this, "Intro2_view");
-//                        } else if (position == 3) {
-//                            EventTracking.logEvent(IntroActivity.this, "Intro3_view");
-//                        }
-//                    } else {
-//
-//                    }
                     if (position == 0) {
                         EventTracking.logEvent(IntroActivity.this, "Intro1_view");
                     } else if (position == 1) {
@@ -174,16 +127,6 @@ public class IntroActivity extends BaseActivity<ActivityIntroBinding> {
 
     private void changeContentInit(int position) {
         binding.tvIntro.setText(title[position]);
-        binding.tvIntroContent.setText(content[position]);
-//        if (IsNetWork.haveNetworkConnection(this) && !ConstantIdAds.listIDAdsNativeIntroFull.isEmpty() && ConstantRemote.native_intro_full && CheckAds.getInstance().isShowAds(getBaseContext())) {
-//            for (int i = 0; i < 4; i++) {
-//                if (i == position) {
-//                    dots[i].setImageResource(R.drawable.ic_intro_s);
-//                } else dots[i].setImageResource(R.drawable.ic_intro_sn);
-//            }
-//        } else {
-//
-//        }
         if (binding.circle4.getVisibility() == View.VISIBLE) {
             binding.circle4.setVisibility(View.GONE);
         }
@@ -192,15 +135,11 @@ public class IntroActivity extends BaseActivity<ActivityIntroBinding> {
                 dots[i].setImageResource(R.drawable.ic_intro_s);
             } else dots[i].setImageResource(R.drawable.ic_intro_sn);
         }
-        switch (position) {
-
-        }
     }
 
 
     @Override
     protected void onResume() {
-//        AppOpenManager.getInstance().enableAppResumeWithActivity(IntroActivity.class);
         super.onResume();
     }
 

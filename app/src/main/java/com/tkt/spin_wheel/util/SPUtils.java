@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 public class SPUtils {
     public static final String SHARED_PREFS_NAME = "BaseJava";
+    public static final String STORAGE = "STORAGE";
     public static String CAMERA = "CAMERA";
     public static String NOTIFICATION = "NOTIFICATION";
     public static String LANGUAGE = "LANGUAGE";

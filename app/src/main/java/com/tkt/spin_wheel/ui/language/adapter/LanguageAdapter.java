@@ -48,7 +48,7 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.Langug
         if (languageModel.getActive()) {
             holder.layoutItem.setBackgroundResource(R.drawable.bg_lang_item_s);
         } else {
-            holder.layoutItem.setBackgroundResource(R.drawable.bg_lang_item_sn);
+            holder.layoutItem.setBackgroundResource(R.drawable.bg_lang_item_sn2);
         }
         holder.tvLang.setText(languageModel.getName());
         switch (languageModel.getCode()) {

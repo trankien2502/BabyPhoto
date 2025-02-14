@@ -7,15 +7,20 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
+
 import com.tkt.spin_wheel.R;
+import com.tkt.spin_wheel.ads.IsNetWork;
 import com.tkt.spin_wheel.base.BaseActivity;
 import com.tkt.spin_wheel.databinding.ActivityPermissionBinding;
 import com.tkt.spin_wheel.dialog.GoToSettingDialog;
@@ -25,13 +30,18 @@ import com.tkt.spin_wheel.util.PermissionManager;
 import com.tkt.spin_wheel.util.SPUtils;
 import com.tkt.spin_wheel.util.SystemUtil;
 
+import org.jetbrains.annotations.Nullable;
+
 
 public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> {
 
-    private static final int REQUEST_CODE_CAMERA_PERMISSION = 120;
+    private static final int REQUEST_CODE_STORAGE_PERMISSION = 120;
     private static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 130;
-    private int countCamera = 0;
+    private int countStorage = 0;
     private int countNotification = 0;
+    //    GoToSettingDialog dialog;
+    Handler handler = new Handler();
+    Runnable runnableNativeAds;
 
     @Override
     public ActivityPermissionBinding getBinding() {
@@ -41,8 +51,11 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
     @Override
     public void initView() {
         EventTracking.logEvent(this, "permission_open");
-        countCamera = SPUtils.getInt(this, SPUtils.CAMERA, 0);
+        countStorage = SPUtils.getInt(this, SPUtils.STORAGE, 0);
         countNotification = SPUtils.getInt(this, SPUtils.NOTIFICATION, 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            binding.rlStorage.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -52,7 +65,7 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
             startNextActivity(HomeActivity.class, null);
             finishAffinity();
         });
-        binding.swPerNotification.setOnClickListener(view -> {
+        binding.swNotificationPer.setOnClickListener(view -> {
             if (!PermissionManager.checkNotificationPermission(this)) {
                 EventTracking.logEvent(this, "permission_allow_click");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -60,10 +73,10 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
                 }
             }
         });
-        binding.swPer.setOnClickListener(view -> {
-            if (!PermissionManager.checkCameraPermission(this)) {
+        binding.swStoragePer.setOnClickListener(view -> {
+            if (!PermissionManager.checkImageStoragePermission(this)) {
                 EventTracking.logEvent(this, "permission_allow_click");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_CAMERA_PERMISSION);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_PERMISSION);
             }
         });
     }
@@ -78,18 +91,18 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_CAMERA_PERMISSION) {
+        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                checkSwCamera();
+                checkSwStorage();
             }
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                checkSwCamera();
+                checkSwStorage();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                        countCamera++;
+                    if (!shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        countStorage++;
 //                        AppOpenManager.getInstance().disableAppResumeWithActivity(PermissionActivity.class);
-                        SPUtils.setInt(this, SPUtils.CAMERA, countCamera);
-                        if (countCamera > 1) {
+                        SPUtils.setInt(this, SPUtils.STORAGE, countStorage);
+                        if (countStorage > 1) {
                             showDialogGotoSetting(2);
                         }
                     }
@@ -125,7 +138,9 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
         if (type == 1) {
             dialog.binding.tvContent.setText(R.string.content_dialog_per_noti);
         } else if (type == 2) {
-            dialog.binding.tvContent.setText(R.string.content_dialog_per_camera);
+            dialog.binding.tvContent.setText(R.string.content_dialog_per_storage);
+        } else {
+            dialog.binding.tvContent.setText(R.string.content_dialog_per_overlay);
         }
 
         dialog.binding.tvStay.setOnClickListener(view -> {
@@ -137,11 +152,28 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
         dialog.binding.tvAgree.setOnClickListener(view -> {
 //            AppOpenManager.getInstance().disableAppResumeWithActivity(PermissionActivity.class);
             dialog.dismiss();
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intent.setData(uri);
-            resultLauncher.launch(intent);
+            if (type == 1 || type == 2) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                resultLauncher.launch(intent);
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    try {
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        resultLauncher.launch(intent);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.e("PermissionError", "Error opening settings: " + e.getMessage());
+                    }
+
+                }
+            }
+
         });
         dialog.show();
     }
@@ -153,41 +185,45 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
 
 
     @SuppressLint("ClickableViewAccessibility")
-    private void checkSwCamera() {
-        if (PermissionManager.checkCameraPermission(this)) {
-            binding.swPer.setChecked(true);
-            binding.swPer.setOnTouchListener((view, motionEvent) -> true);
+    private void checkSwStorage() {
+        if (PermissionManager.checkImageStoragePermission(this)) {
+            binding.swStoragePer.setChecked(true);
+            binding.swStoragePer.setOnTouchListener((view, motionEvent) -> true);
         } else {
-            binding.swPer.setChecked(false);
-            binding.swPer.setOnTouchListener((view, motionEvent) -> false);
+            binding.swStoragePer.setChecked(false);
+            binding.swStoragePer.setOnTouchListener((view, motionEvent) -> false);
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private void checkSwNotification() {
         if (PermissionManager.checkNotificationPermission(this)) {
-            binding.swPerNotification.setChecked(true);
-            binding.swPerNotification.setOnTouchListener((view, motionEvent) -> true);
+            binding.swNotificationPer.setChecked(true);
+            binding.swNotificationPer.setOnTouchListener((view, motionEvent) -> true);
         } else {
-            binding.swPerNotification.setChecked(false);
-            binding.swPerNotification.setOnTouchListener((view, motionEvent) -> false);
+            binding.swNotificationPer.setChecked(false);
+            binding.swNotificationPer.setOnTouchListener((view, motionEvent) -> false);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+//        if (dialog != null) dialog.dismiss();
         checkSwNotification();
-        checkSwCamera();
+        checkSwStorage();
     }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        handler.removeCallbacks(runnableNativeAds);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        handler.removeCallbacks(runnableNativeAds);
     }
 }

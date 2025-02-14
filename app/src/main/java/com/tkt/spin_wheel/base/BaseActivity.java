@@ -22,6 +22,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.tkt.spin_wheel.R;
 import com.tkt.spin_wheel.dialog.LoadingDialog;
+import com.tkt.spin_wheel.ui.home.HomeActivity;
 import com.tkt.spin_wheel.util.SystemUtil;
 import com.tkt.spin_wheel.ui.intro.IntroActivity;
 
@@ -74,7 +75,7 @@ public abstract class BaseActivity<VB extends ViewBinding> extends AppCompatActi
                 onBack();
             }
         });
-        if (!(this instanceof IntroActivity)) {
+        if (!(this instanceof IntroActivity) && !(this instanceof HomeActivity)) {
             binding.getRoot().setPadding(
                     binding.getRoot().getPaddingLeft(),
                     binding.getRoot().getPaddingTop() + getStatusBarHeight(),

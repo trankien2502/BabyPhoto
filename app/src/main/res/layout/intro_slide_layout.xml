@@ -11,15 +11,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/im_LogoSlide"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:scaleType="fitCenter"
-                app:layout_constraintDimensionRatio="360:408"
+                app:layout_constraintDimensionRatio="824:1160"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -37,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-<!--            <include layout="@layout/layout_native_load_full" />-->
+            <!--            <include layout="@layout/layout_native_load_full" />-->
         </FrameLayout>
     </RelativeLayout>
 
