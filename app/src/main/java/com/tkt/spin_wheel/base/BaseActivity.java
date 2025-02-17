@@ -12,9 +12,11 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -93,6 +95,13 @@ public abstract class BaseActivity<VB extends ViewBinding> extends AppCompatActi
         createLoadingDialog();
         initView();
         bindView();
+//        EdgeToEdge.enable(this);
+//        setContentView(R.layout.activity_crop);
+//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+//            return insets;
+//        });
     }
 
     public void hideFullNavigation() {

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.home.crop.CropActivity">
+    <com.tkt.spin_wheel.ui.home.crop.CropImageView
+        android:id="@+id/cropImageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:scv_crop_mode="free"
+        app:scv_frame_color="#000000"
+        app:scv_frame_stroke_weight="2dp"
+        app:scv_handle_shadow_enabled = "false"
+        app:scv_guide_color="#000000"
+        app:scv_guide_stroke_weight="1dp"
+        app:scv_handle_color="#000000"
+        app:scv_handle_size="6dp"
+        app:scv_min_frame_size="50dp"
+        app:scv_overlay_color="#80d9d9d9"
+        app:scv_touch_padding="8dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

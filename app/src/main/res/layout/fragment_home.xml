@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#00000000"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.home.start.HomeFragment">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clStart"
+        android:layout_width="match_parent"
+        android:layout_height="84dp"
+        android:layout_marginHorizontal="24dp"
+        android:background="@drawable/create_home"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="20dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivBaby"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_baby_home"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="8dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/aeonik_pro_bold"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:maxLines="2"
+            android:text="@string/start_with_image"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toStartOf="@id/rlAdd"
+            app:layout_constraintStart_toEndOf="@id/ivBaby"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RelativeLayout
+            android:id="@+id/rlAdd"
+            android:layout_width="80dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_add_round"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/add_round" />
+        </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/llItem"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_home_list_item"
+        android:orientation="horizontal"
+        android:weightSum="4"
+        app:layout_constraintTop_toBottomOf="@id/clStart">
+
+        <TextView
+            android:id="@+id/tvHoliday"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/aeonik_pro_regular"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:lines="1"
+            android:text="@string/holiday"
+            android:textColor="#A3A3A3"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvMilestones"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_home_item"
+            android:ellipsize="end"
+            android:fontFamily="@font/aeonik_pro_regular"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:lines="1"
+            android:text="@string/milestones"
+            android:textColor="#064380"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvAITrend"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/aeonik_pro_regular"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:lines="1"
+            android:text="@string/ai_trend"
+            android:textColor="#A3A3A3"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvGeneral"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/aeonik_pro_regular"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:lines="1"
+            android:text="@string/general"
+            android:textColor="#A3A3A3"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/llItem"
+        android:layout_marginTop="8dp"
+        tools:listitem="@layout/item_language"
+        tools:itemCount="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="16dp"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

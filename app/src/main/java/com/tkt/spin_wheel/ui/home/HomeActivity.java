@@ -1,18 +1,22 @@
 package com.tkt.spin_wheel.ui.home;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.fragment.app.Fragment;
 
 import com.tkt.spin_wheel.base.BaseActivity;
 import com.tkt.spin_wheel.dialog.exit.ExitAppDialog;
 import com.tkt.spin_wheel.dialog.exit.IClickDialogExit;
 import com.tkt.spin_wheel.dialog.rate.IClickDialogRate;
 import com.tkt.spin_wheel.dialog.rate.RatingDialog;
+import com.tkt.spin_wheel.ui.home.creation.CreationFragment;
+import com.tkt.spin_wheel.ui.home.start.HomeFragment;
 import com.tkt.spin_wheel.ui.setting.SettingActivity;
 import com.tkt.spin_wheel.util.EventTracking;
 import com.tkt.spin_wheel.util.SPUtils;
@@ -33,6 +37,9 @@ import java.util.Arrays;
 
 public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
 
+    private static final int STATE_HOME = 1;
+    private static final int STATE_CREATION = 2;
+    int state = 1;
 
     ArrayList<String> exitRate = new ArrayList<String>(Arrays.asList("2", "4", "6", "8", "10"));
 
@@ -50,14 +57,39 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
                 binding.clView.getPaddingRight(),
                 binding.clView.getPaddingBottom()
         );
-        EventTracking.logEvent(this,"home_view");
+        EventTracking.logEvent(this, "home_view");
+        changeState();
     }
 
     @Override
     public void bindView() {
         binding.ivSetting.setOnClickListener(view -> {
-            startNextActivity(SettingActivity.class,null);
+            startNextActivity(SettingActivity.class, null);
         });
+        binding.llHome.setOnClickListener(view -> {
+            state = STATE_HOME;
+            changeState();
+        });
+        binding.llCreation.setOnClickListener(view -> {
+            state = STATE_CREATION;
+            changeState();
+        });
+    }
+
+    private void changeState() {
+        if (state == STATE_HOME) {
+            binding.ivHome.setImageResource(R.drawable.buildings_s);
+            binding.tvHome.setTextColor(Color.parseColor("#064380"));
+            binding.ivCreation.setImageResource(R.drawable.filled_sn);
+            binding.tvCreation.setTextColor(Color.parseColor("#73808C"));
+            replaceFragment(new HomeFragment());
+        } else {
+            binding.ivHome.setImageResource(R.drawable.buildings_sn);
+            binding.tvHome.setTextColor(Color.parseColor("#73808C"));
+            binding.ivCreation.setImageResource(R.drawable.filled_s);
+            binding.tvCreation.setTextColor(Color.parseColor("#064380"));
+            replaceFragment(new CreationFragment());
+        }
     }
 
     @Override
@@ -73,10 +105,16 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
         }
     }
 
-    ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode()==RESULT_OK){
+    private void replaceFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frameContent, fragment)
+                .commit();
+    }
+
+    public ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_OK) {
             //ads
-            Log.d("activity_check","home");
+            Log.d("activity_check", "home");
         }
     });
 
@@ -95,8 +133,8 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
                     finishAffinity();
                     startActivity(Intent.createChooser(sendIntent, getString(R.string.Send_Email)));
                     SharePrefUtils.forceRated(HomeActivity.this);
-                    int star = SPUtils.getInt(HomeActivity.this,SPUtils.RATE_STAR,0);
-                    EventTracking.logEvent(HomeActivity.this,"rate_submit","rate_star"+star,String.valueOf(star));
+                    int star = SPUtils.getInt(HomeActivity.this, SPUtils.RATE_STAR, 0);
+                    EventTracking.logEvent(HomeActivity.this, "rate_submit", "rate_star" + star, String.valueOf(star));
                 } catch (android.content.ActivityNotFoundException ex) {
                     Toast.makeText(HomeActivity.this, getString(R.string.There_is_no), Toast.LENGTH_SHORT).show();
                 }
@@ -112,8 +150,8 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
                         Task<Void> flow = manager.launchReviewFlow(HomeActivity.this, reviewInfo);
                         flow.addOnSuccessListener(result -> {
                             //binding.rlRate.setVisibility(View.GONE);
-                            int star = SPUtils.getInt(HomeActivity.this,SPUtils.RATE_STAR,0);
-                            EventTracking.logEvent(HomeActivity.this,"rate_submit","rate_star"+star,String.valueOf(star));
+                            int star = SPUtils.getInt(HomeActivity.this, SPUtils.RATE_STAR, 0);
+                            EventTracking.logEvent(HomeActivity.this, "rate_submit", "rate_star" + star, String.valueOf(star));
                             SharePrefUtils.forceRated(HomeActivity.this);
                             ratingDialog.dismiss();
                             finishAffinity();
@@ -126,14 +164,14 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
 
             @Override
             public void later() {
-                EventTracking.logEvent(HomeActivity.this,"rate_not_now");
+                EventTracking.logEvent(HomeActivity.this, "rate_not_now");
                 ratingDialog.dismiss();
                 finishAffinity();
             }
 
         });
         ratingDialog.show();
-        EventTracking.logEvent(this,"rate_show");
+        EventTracking.logEvent(this, "rate_show");
     }
 
 

@@ -61,6 +61,19 @@
     <string name="agree_and_continue">Agree and Continue</string>
     <string name="camera">Camera</string>
     <string name="read_image_storage">Read Image Storage</string>
+    <string name="capture_precious_moments">Capture Precious Moments</string>
+    <string name="start_with_image">Start with Image</string>
+    <string name="customize_freestyle">Customize Freestyle</string>
+    <string name="holiday">Holiday</string>
+    <string name="milestones">Milestones</string>
+    <string name="ai_trend">AI Trend</string>
+    <string name="general">General</string>
+    <string name="home">Home</string>
+    <string name="my_creation">My Creation</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="no_image_in_here">No image in here.</string>
+    <string name="create_new">Create New</string>
 
 
 </resources>
