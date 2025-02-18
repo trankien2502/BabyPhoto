@@ -192,7 +192,14 @@ public class CropImageView extends androidx.appcompat.widget.AppCompatImageView 
         handleStyleable(context, attrs, defStyle, density);
     }
 
-    // Lifecycle methods ///////////////////////////////////////////////////////////////////////////
+    public float getmImgWidth() {
+        return mImgWidth;
+    }
+
+    public float getmImgHeight() {
+        return mImgHeight;
+    }
+// Lifecycle methods ///////////////////////////////////////////////////////////////////////////
 
     @Override
     public Parcelable onSaveInstanceState() {
@@ -512,10 +519,16 @@ public class CropImageView extends androidx.appcompat.widget.AppCompatImageView 
 
         canvas.drawLine(mFrameRect.right-dpTOpx(38f),mFrameRect.top-dpTOpx(2f),mFrameRect.right+dpTOpx(5f),mFrameRect.top-dpTOpx(2f),mPaintFrame);
         canvas.drawLine(mFrameRect.right+dpTOpx(2f),mFrameRect.top-dpTOpx(5f),mFrameRect.right+dpTOpx(2f),mFrameRect.top+dpTOpx(38f),mPaintFrame);
+
+        canvas.drawLine(mFrameRect.left-dpTOpx(5f),mFrameRect.bottom+dpTOpx(2f),mFrameRect.left+dpTOpx(38f),mFrameRect.bottom+dpTOpx(2f),mPaintFrame);
+        canvas.drawLine(mFrameRect.left-dpTOpx(2f),mFrameRect.bottom-dpTOpx(38f),mFrameRect.left-dpTOpx(2f),mFrameRect.bottom+dpTOpx(5f),mPaintFrame);
+
+        canvas.drawLine(mFrameRect.right-dpTOpx(38f),mFrameRect.bottom+dpTOpx(2f),mFrameRect.right+dpTOpx(5f),mFrameRect.bottom+dpTOpx(2f),mPaintFrame);
+        canvas.drawLine(mFrameRect.right+dpTOpx(2f),mFrameRect.bottom-dpTOpx(38f),mFrameRect.right+dpTOpx(2f),mFrameRect.bottom+dpTOpx(5f),mPaintFrame);
 //        canvas.drawCircle(mFrameRect.left, mFrameRect.top, mHandleSize, mPaintFrame);
 //        canvas.drawCircle(mFrameRect.right, mFrameRect.top, mHandleSize, mPaintFrame);
-        canvas.drawCircle(mFrameRect.left, mFrameRect.bottom, mHandleSize, mPaintFrame);
-        canvas.drawCircle(mFrameRect.right, mFrameRect.bottom, mHandleSize, mPaintFrame);
+//        canvas.drawCircle(mFrameRect.left, mFrameRect.bottom, mHandleSize, mPaintFrame);
+//        canvas.drawCircle(mFrameRect.right, mFrameRect.bottom, mHandleSize, mPaintFrame);
     }
 
     private void drawHandleShadows(Canvas canvas) {

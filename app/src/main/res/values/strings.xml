@@ -74,6 +74,26 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="no_image_in_here">No image in here.</string>
     <string name="create_new">Create New</string>
+    <string name="crop_image">Crop Image</string>
+    <string name="origin">Origin</string>
+    <string name="save">Save</string>
+    <string name="more_than_50_items_at_once">bbbbb</string>
+    <string name="change_photo">Change photo</string>
+    <string name="flip_h">Flip H</string>
+    <string name="flip_v">Flip V</string>
+    <string name="opacity">Opacity</string>
+    <string name="edit_text">Edit Text</string>
+    <string name="font">Font</string>
+    <string name="shadow">Shadow</string>
+    <string name="format">Format</string>
+    <string name="background">Background</string>
+    <string name="remove">Remove</string>
+    <string name="filter">Filter</string>
+    <string name="border">Border</string>
+    <string name="frame">Frame</string>
+    <string name="sticker">Sticker</string>
+    <string name="text">Text</string>
+    <string name="photo">Photo</string>
 
 
 </resources>

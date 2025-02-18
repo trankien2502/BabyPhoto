@@ -34,7 +34,7 @@ android {
     }
     flavorDimensions "default"
     productFlavors {
-        appDeug{
+        appDeug {
             manifestPlaceholders = [app_id: "ca-app-pub-3940256099942544~3347511713"]
             buildConfigField "String", "open_splash", "\"ca-app-pub-3940256099942544/9257395921\""
             buildConfigField "String", "inter_splash", "\"ca-app-pub-3940256099942544/1033173712\""
@@ -46,9 +46,9 @@ android {
             buildConfigField "Boolean", "build_debug", "true"
         }
 
-        appRelease{
+        appRelease {
             manifestPlaceholders = [app_id: "ca-app-pub-6263349256068158~5615734892"]
-            
+
             buildConfigField "Boolean", "build_debug", "false"
         }
     }
@@ -83,6 +83,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+//    implementation 'androidx.activity:activity:1.10.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -95,7 +96,7 @@ dependencies {
     //loadding...
     implementation "com.airbnb.android:lottie:6.3.0"
     implementation 'com.github.yalantis:ucrop:2.2.6'
-    implementation ("io.reactivex.rxjava3:rxjava:3.1.5")
+    implementation("io.reactivex.rxjava3:rxjava:3.1.5")
     //database
     implementation 'androidx.room:room-runtime:2.4.2'
     annotationProcessor 'androidx.room:room-compiler:2.4.2'
@@ -143,10 +144,10 @@ dependencies {
 //    implementation 'com.google.ads.mediation:unity:4.6.1.0'
 
     //retrofit
-//    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-//    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-//    implementation 'androidx.lifecycle:lifecycle-process:2.7.0'
-    //       implementation "com.squareup.okhttp3:okhttp:4.11.0"
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'androidx.lifecycle:lifecycle-process:2.7.0'
+    implementation "com.squareup.okhttp3:okhttp:4.11.0"
 
     //SDK
 //    implementation 'com.google.ads.mediation:fyber:8.2.4.0'
