@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ui.home.edit.EditActivity">
+    tools:context="picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.EditActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clHeader"
@@ -77,7 +77,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.tkt.spin_wheel.custom_sticker.StickerView
+        <picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.StickerView
             android:id="@+id/stickerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -103,13 +103,14 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal">
+
             <LinearLayout
                 android:id="@+id/llMainPhoto"
-                android:visibility="visible"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:paddingHorizontal="8dp">
+                android:paddingHorizontal="8dp"
+                android:visibility="visible">
 
                 <LinearLayout
                     android:id="@+id/llChangePhoto"
@@ -135,6 +136,7 @@
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llMainPhotoFlipH"
                     android:layout_width="wrap_content"
@@ -159,6 +161,7 @@
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llMainPhotoFlipV"
                     android:layout_width="wrap_content"
@@ -184,13 +187,14 @@
                         android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/llSticker"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:visibility="gone"
                 android:orientation="horizontal"
-                android:paddingHorizontal="8dp">
+                android:paddingHorizontal="8dp"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:id="@+id/llStickerRemove"
@@ -216,6 +220,7 @@
                         android:textColor="#CC0000"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llStickerFlipH"
                     android:layout_width="wrap_content"
@@ -240,6 +245,7 @@
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llStickerFlipV"
                     android:layout_width="wrap_content"
@@ -264,6 +270,7 @@
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llStickerOpacity"
                     android:layout_width="wrap_content"
@@ -289,13 +296,14 @@
                         android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/llText"
-                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:paddingHorizontal="8dp">
+                android:paddingHorizontal="8dp"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:id="@+id/llTextRemove"
@@ -321,6 +329,7 @@
                         android:textColor="#CC0000"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llTextEdit"
                     android:layout_width="wrap_content"
@@ -345,6 +354,7 @@
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llTextFont"
                     android:layout_width="wrap_content"
@@ -369,6 +379,7 @@
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llTextFomart"
                     android:layout_width="wrap_content"
@@ -393,6 +404,7 @@
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llTextShadow"
                     android:layout_width="wrap_content"
@@ -417,6 +429,7 @@
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llTextBackground"
                     android:layout_width="wrap_content"
@@ -442,13 +455,14 @@
                         android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/llPhoto"
-                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:paddingHorizontal="8dp">
+                android:paddingHorizontal="8dp"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:id="@+id/llPhotoRemove"
@@ -474,6 +488,7 @@
                         android:textColor="#CC0000"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llPhotoFlipH"
                     android:layout_width="wrap_content"
@@ -498,6 +513,7 @@
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llPhotoFlipV"
                     android:layout_width="wrap_content"
@@ -522,6 +538,7 @@
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llPhotoFilter"
                     android:layout_width="wrap_content"
@@ -546,6 +563,7 @@
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llPhotoOpacity"
                     android:layout_width="wrap_content"
@@ -612,17 +630,17 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:weightSum="4"
             android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
             android:paddingVertical="12dp"
-            android:paddingHorizontal="16dp">
+            android:weightSum="4">
 
             <LinearLayout
                 android:id="@+id/clFrame"
                 android:layout_width="0dp"
+                android:layout_height="64dp"
                 android:layout_marginHorizontal="8dp"
                 android:layout_weight="1"
-                android:layout_height="64dp"
                 android:gravity="center"
                 android:orientation="vertical">
 
@@ -648,9 +666,9 @@
             <LinearLayout
                 android:id="@+id/clSticker"
                 android:layout_width="0dp"
+                android:layout_height="64dp"
                 android:layout_marginHorizontal="8dp"
                 android:layout_weight="1"
-                android:layout_height="64dp"
                 android:gravity="center"
                 android:orientation="vertical">
 
@@ -677,9 +695,9 @@
             <LinearLayout
                 android:id="@+id/clText"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_marginHorizontal="8dp"
                 android:layout_height="64dp"
+                android:layout_marginHorizontal="8dp"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
 
@@ -706,9 +724,9 @@
             <LinearLayout
                 android:id="@+id/clPhoto"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_marginHorizontal="8dp"
                 android:layout_height="64dp"
+                android:layout_marginHorizontal="8dp"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
 

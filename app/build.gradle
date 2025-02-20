@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.tkt.spin_wheel'
+    namespace 'picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.tkt.spin_wheel"
+        applicationId "picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto"
         minSdk 21
         targetSdk 34
         versionCode 100
