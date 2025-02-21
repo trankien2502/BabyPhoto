@@ -19,6 +19,7 @@ import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.materni
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.databinding.ActivityCropBinding;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.crop.callback.CropCallback;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.EditActivity;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.SPUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,8 +32,7 @@ public class CropActivity extends BaseActivity<ActivityCropBinding> {
     private ActivityResultLauncher<Intent> imagePickerLauncher;
     private Uri sourceUri;
     String path;
-
-    public static Bitmap bitmapCropped;
+    int code;
 
     @Override
     public ActivityCropBinding getBinding() {
@@ -41,6 +41,8 @@ public class CropActivity extends BaseActivity<ActivityCropBinding> {
 
     @Override
     public void initView() {
+        code = getIntent().getIntExtra("CROP_IMAGE_STATUS", 0);
+        Log.e("check_crop_image", "code: " + code);
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -70,10 +72,11 @@ public class CropActivity extends BaseActivity<ActivityCropBinding> {
         }
         return file.getAbsolutePath();
     }
+
     public File saveBitmapToCache(Bitmap bitmap) {
         File cachePath = new File(getCacheDir(), "images");
         cachePath.mkdirs();
-        File file = new File(cachePath, "image.png");
+        File file = new File(cachePath, "image_" + System.currentTimeMillis() + ".png");
         try (FileOutputStream stream = new FileOutputStream(file)) {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             path = file.getAbsolutePath();
@@ -82,6 +85,7 @@ public class CropActivity extends BaseActivity<ActivityCropBinding> {
         }
         return file;
     }
+
     public Bitmap getBitmapFromUri(Uri uri) {
         Bitmap bitmap = null;
         try {
@@ -96,6 +100,7 @@ public class CropActivity extends BaseActivity<ActivityCropBinding> {
         }
         return bitmap;
     }
+
     public ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
             //ads
@@ -106,6 +111,7 @@ public class CropActivity extends BaseActivity<ActivityCropBinding> {
             imagePickerLauncher.launch(pickPhotoIntent);
         }
     });
+
     @Override
     public void bindView() {
         binding.ivBack.setOnClickListener(view -> {
@@ -115,15 +121,23 @@ public class CropActivity extends BaseActivity<ActivityCropBinding> {
             binding.cropImageView.cropAsync(new CropCallback() {
                 @Override
                 public void onSuccess(Bitmap cropped) {
-                    bitmapCropped = cropped;
-                    File imageFile = saveBitmapToCache(cropped);
-                    Uri imageUri = FileProvider.getUriForFile(CropActivity.this, getPackageName()+ ".provider", imageFile);
-                    Intent intent = new Intent(CropActivity.this, EditActivity.class);
-                    intent.putExtra("image_path", path);
-                    intent.putExtra("image_uri", imageUri.toString());
-//                    Toast.makeText(CropActivity.this, "image uri: "+imageUri.toString(), Toast.LENGTH_SHORT).show();
-                    resultLauncher.launch(intent);
-
+                    if (code != 0) {
+                        File imageFile = saveBitmapToCache(cropped);
+                        Uri imageUri = FileProvider.getUriForFile(CropActivity.this, getPackageName() + ".provider", imageFile);
+                        SPUtils.setString(getBaseContext(), SPUtils.IMAGE_PATH, path);
+                        SPUtils.setString(getBaseContext(), SPUtils.IMAGE_URI, imageUri.toString());
+                        Log.e("check_crop_image", "path: " + path);
+                        Log.e("check_crop_image", "imageuri: " + imageUri.toString());
+                        setResult(code);
+                        finish();
+                    } else {
+                        File imageFile = saveBitmapToCache(cropped);
+                        Uri imageUri = FileProvider.getUriForFile(CropActivity.this, getPackageName() + ".provider", imageFile);
+                        Intent intent = new Intent(CropActivity.this, EditActivity.class);
+                        intent.putExtra("image_path", path);
+                        intent.putExtra("image_uri", imageUri.toString());
+                        resultLauncher.launch(intent);
+                    }
                 }
 
                 @Override
@@ -163,7 +177,8 @@ public class CropActivity extends BaseActivity<ActivityCropBinding> {
             binding.cropImageView.setCropMode(CropImageView.CropMode.RATIO_9_16);
         });
     }
-    private void resetChange(){
+
+    private void resetChange() {
         binding.ivOrigin.setImageResource(R.drawable.crop_origin_sn);
         binding.iv11.setImageResource(R.drawable.crop_11_sn);
         binding.iv23.setImageResource(R.drawable.crop_23_sn);
@@ -171,6 +186,7 @@ public class CropActivity extends BaseActivity<ActivityCropBinding> {
         binding.iv45.setImageResource(R.drawable.crop_45_sn);
         binding.iv916.setImageResource(R.drawable.crop_916_sn);
     }
+
     @Override
     public void onBack() {
         setResult(RESULT_OK);

@@ -6,8 +6,11 @@ import android.content.SharedPreferences;
 public class SPUtils {
     public static final String SHARED_PREFS_NAME = "Newborn Photo, Baby Milestones";
     public static final String STORAGE = "STORAGE";
+    public static final String CALL_API_SUCCESS = "CALL_API_SUCCESS";
+    public static final String CALL_API_TIME_DONE = "CALL_API_TIME_DONE";
     public static String TYPE_EDIT = "TYPE_EDIT";
-    public static String CUSTOM = "CUSTOM";
+    public static String IMAGE_PATH = "IMAGE_PATH";
+    public static String IMAGE_URI = "IMAGE_URI";
     public static String TEMPLATE = "TEMPLATE";
     public static String NOTIFICATION = "NOTIFICATION";
     public static String LANGUAGE = "LANGUAGE";

@@ -32,6 +32,7 @@
             android:layout_marginHorizontal="12dp"
             android:fontFamily="@font/aeonik_pro_bold"
             android:gravity="center"
+            android:visibility="invisible"
             android:paddingHorizontal="4dp"
             android:text="@string/crop_image"
             android:textColor="@color/black"
@@ -76,6 +77,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/ivFrameEdit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"/>
 
         <picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.StickerView
             android:id="@+id/stickerView"
@@ -110,7 +116,7 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:paddingHorizontal="8dp"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <LinearLayout
                     android:id="@+id/llChangePhoto"
@@ -194,7 +200,7 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:paddingHorizontal="8dp"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <LinearLayout
                     android:id="@+id/llStickerRemove"

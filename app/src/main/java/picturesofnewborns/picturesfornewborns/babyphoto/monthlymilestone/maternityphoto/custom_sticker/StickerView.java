@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -256,7 +257,11 @@ public class StickerView extends FrameLayout {
         }
         if (handlingSticker != null && !locked && (showIcons)) {
             getStickerPoints(handlingSticker, bitmapPoints);
-
+//            borderPicturePaint.setAntiAlias(true);
+            borderPicturePaint.setStyle(Paint.Style.STROKE);
+            borderPicturePaint.setColor(handlingSticker.getColorBorder());
+            borderPicturePaint.setAlpha(handlingSticker.getAlpha());
+            borderPicturePaint.setStrokeWidth(convertSpToPx(handlingSticker.getBorderWidth(), context));
             float x1 = bitmapPoints[0];
             float y1 = bitmapPoints[1];
             float x2 = bitmapPoints[2];
@@ -265,17 +270,19 @@ public class StickerView extends FrameLayout {
             float y3 = bitmapPoints[5];
             float x4 = bitmapPoints[6];
             float y4 = bitmapPoints[7];
-            handlingSticker.setBorderWidth(convertSpToPx(7f, context));
-            if (handlingSticker.getBorderWidth()!=0) {
-                borderPicturePaint.setAntiAlias(true);
-                borderPicturePaint.setColor(Color.YELLOW);
-                borderPicturePaint.setAlpha(handlingSticker.getAlpha());
-                borderPicturePaint.setStrokeWidth(handlingSticker.getBorderWidth());
-                canvas.drawLine(x1, y1, x2, y2, borderPicturePaint);
-                canvas.drawLine(x1, y1, x3, y3, borderPicturePaint);
-                canvas.drawLine(x2, y2, x4, y4, borderPicturePaint);
-                canvas.drawLine(x4, y4, x3, y3, borderPicturePaint);
-            }
+            Path path = new Path();
+            path.moveTo(x1, y1);
+            path.lineTo(x2, y2);
+            path.lineTo(x4, y4);
+            path.lineTo(x3, y3);
+//            path.lineTo(x1, y1);
+            path.close();
+
+            canvas.drawPath(path, borderPicturePaint);
+//            canvas.drawLine(x1, y1, x2, y2, borderPicturePaint);
+//            canvas.drawLine(x1, y1, x3, y3, borderPicturePaint);
+//            canvas.drawLine(x2, y2, x4, y4, borderPicturePaint);
+//            canvas.drawLine(x4, y4, x3, y3, borderPicturePaint);
         }
         if (handlingSticker != null && !locked && (showBorder || showIcons)) {
             getStickerPoints(handlingSticker, bitmapPoints);
@@ -1252,6 +1259,9 @@ public class StickerView extends FrameLayout {
                 drawableStickerNew.setPagerSelect(sticker.getPagerSelect());
                 drawableStickerNew.setPosSelect(sticker.getPosSelect());
                 drawableStickerNew.setHide(sticker.isHide());
+                drawableStickerNew.setAlpha(sticker.getAlpha());
+                drawableStickerNew.setBorderWidth(sticker.getBorderWidth());
+                drawableStickerNew.setColorBorder(sticker.getColorBorder());
                 drawableStickerNew.setLock(sticker.isLock());
                 drawableStickerNew.setFlippedHorizontally(sticker.isFlippedHorizontally());
                 drawableStickerNew.setFlippedVertically(sticker.isFlippedVertically());

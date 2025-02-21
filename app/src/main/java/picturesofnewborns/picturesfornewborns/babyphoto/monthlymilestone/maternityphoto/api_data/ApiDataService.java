@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 
 import java.util.List;
 
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.database.icon.IconModel;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -18,14 +19,12 @@ public interface ApiDataService {
             .create();
 
     ApiDataService apiService = new Retrofit.Builder()
-            .baseUrl("https://haiyan116.net/catmaker/")
+            .baseUrl("https://haiyan116.net/babyphoto3/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ApiDataService.class);
 
     @GET("getdata.php")
-    Call<List<String>> callDataApi(@Query("key") String key, @Query("category") String category);
+    Call<List<IconModel>> callDataApi(@Query("key") String key);
 
-    @GET("getcat.php")
-    Call<List<String>> callCatApi(@Query("key") String key, @Query("category") String category, @Query("cat") String cat);
 }

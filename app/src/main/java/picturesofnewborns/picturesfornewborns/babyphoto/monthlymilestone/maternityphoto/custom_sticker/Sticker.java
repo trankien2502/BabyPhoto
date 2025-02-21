@@ -1,6 +1,7 @@
 package picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -43,8 +44,8 @@ public abstract class Sticker {
     private boolean isFlippedHorizontally;
     private boolean isFlippedVertically;
     private boolean isLock;
-    private int colorBorder;
-    private float borderWidth;
+    private int colorBorder = Color.BLACK;
+    private float borderWidth = 7f;
     private int pagerSelect;//pager : face, eyes...
     private int posSelect;// pos: vị trí chọn của list face(vd: face1, face2)
 
