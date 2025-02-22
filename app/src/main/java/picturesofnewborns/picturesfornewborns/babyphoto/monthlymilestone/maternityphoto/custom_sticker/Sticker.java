@@ -45,7 +45,7 @@ public abstract class Sticker {
     private boolean isFlippedVertically;
     private boolean isLock;
     private int colorBorder = Color.BLACK;
-    private float borderWidth = 7f;
+    private float borderWidth = 0f;
     private int pagerSelect;//pager : face, eyes...
     private int posSelect;// pos: vị trí chọn của list face(vd: face1, face2)
 

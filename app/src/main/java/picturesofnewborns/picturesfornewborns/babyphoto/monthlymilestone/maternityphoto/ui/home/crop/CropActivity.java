@@ -1,5 +1,6 @@
 package picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.crop;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -17,6 +19,7 @@ import androidx.core.content.FileProvider;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.R;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.base.BaseActivity;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.databinding.ActivityCropBinding;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.LoadingDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.crop.callback.CropCallback;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.EditActivity;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.SPUtils;
@@ -29,6 +32,7 @@ import java.io.InputStream;
 public class CropActivity extends BaseActivity<ActivityCropBinding> {
 
     Drawable drawable;
+    LoadingDialog loadingDialog;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
     private Uri sourceUri;
     String path;
@@ -112,6 +116,15 @@ public class CropActivity extends BaseActivity<ActivityCropBinding> {
         }
     });
 
+    private void showLoadingDialogEdit() {
+        loadingDialog = new LoadingDialog(this, false);
+        loadingDialog.show();
+    }
+
+    private void dismissLoadingDialogEdit() {
+        if (loadingDialog != null && loadingDialog.isShowing()) loadingDialog.dismiss();
+    }
+
     @Override
     public void bindView() {
         binding.ivBack.setOnClickListener(view -> {
@@ -119,24 +132,49 @@ public class CropActivity extends BaseActivity<ActivityCropBinding> {
         });
         binding.tvNext.setOnClickListener(view -> {
             binding.cropImageView.cropAsync(new CropCallback() {
+                @SuppressLint("StaticFieldLeak")
                 @Override
                 public void onSuccess(Bitmap cropped) {
                     if (code != 0) {
-                        File imageFile = saveBitmapToCache(cropped);
-                        Uri imageUri = FileProvider.getUriForFile(CropActivity.this, getPackageName() + ".provider", imageFile);
-                        SPUtils.setString(getBaseContext(), SPUtils.IMAGE_PATH, path);
-                        SPUtils.setString(getBaseContext(), SPUtils.IMAGE_URI, imageUri.toString());
-                        Log.e("check_crop_image", "path: " + path);
-                        Log.e("check_crop_image", "imageuri: " + imageUri.toString());
-                        setResult(code);
-                        finish();
+                        showLoadingDialogEdit();
+                        new AsyncTask<Void, Void, Uri>() {
+                            @Override
+                            protected Uri doInBackground(Void... voids) {
+                                File imageFile = saveBitmapToCache(cropped);
+                                return FileProvider.getUriForFile(CropActivity.this, getPackageName() + ".provider", imageFile);
+                            }
+
+                            @Override
+                            protected void onPostExecute(Uri imageUri) {
+                                dismissLoadingDialogEdit();
+                                SPUtils.setString(getBaseContext(), SPUtils.IMAGE_PATH, path);
+                                SPUtils.setString(getBaseContext(), SPUtils.IMAGE_URI, imageUri.toString());
+
+                                Log.e("check_crop_image", "path: " + path);
+                                Log.e("check_crop_image", "imageuri: " + imageUri.toString());
+
+                                setResult(code);
+                                finish();
+                            }
+                        }.execute();
                     } else {
-                        File imageFile = saveBitmapToCache(cropped);
-                        Uri imageUri = FileProvider.getUriForFile(CropActivity.this, getPackageName() + ".provider", imageFile);
-                        Intent intent = new Intent(CropActivity.this, EditActivity.class);
-                        intent.putExtra("image_path", path);
-                        intent.putExtra("image_uri", imageUri.toString());
-                        resultLauncher.launch(intent);
+                        showLoadingDialogEdit();
+                        new AsyncTask<Void, Void, Uri>() {
+                            @Override
+                            protected Uri doInBackground(Void... voids) {
+                                File imageFile = saveBitmapToCache(cropped);
+                                return FileProvider.getUriForFile(CropActivity.this, getPackageName() + ".provider", imageFile);
+                            }
+
+                            @Override
+                            protected void onPostExecute(Uri imageUri) {
+                                dismissLoadingDialogEdit();
+                                Intent intent = new Intent(CropActivity.this, EditActivity.class);
+                                intent.putExtra("image_path", path);
+                                intent.putExtra("image_uri", imageUri.toString());
+                                resultLauncher.launch(intent);
+                            }
+                        }.execute();
                     }
                 }
 

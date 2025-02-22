@@ -94,6 +94,21 @@
     <string name="sticker">Sticker</string>
     <string name="text">Text</string>
     <string name="photo">Photo</string>
+    <string name="accessory">Accessory</string>
+    <string name="alphabet">Alphabet</string>
+    <string name="shapes">Shapes</string>
+    <string name="status">Status</string>
+    <string name="mother_day">Mother Day</string>
+    <string name="father_day">Father Day</string>
+    <string name="pregnancy">Pregnancy</string>
+    <string name="toys">Toys</string>
+    <string name="baby_boy">Baby Boy</string>
+    <string name="baby_girl">Baby Girl</string>
+    <string name="_1st_time">1st Time</string>
+    <string name="announcement">Announcement</string>
+    <string name="summer">Summer</string>
+    <string name="new_year">New year</string>
+    <string name="error">Error\n</string>
 
 
 </resources>

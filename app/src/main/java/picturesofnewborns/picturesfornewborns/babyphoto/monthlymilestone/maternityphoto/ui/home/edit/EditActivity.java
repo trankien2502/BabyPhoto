@@ -20,7 +20,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -36,16 +35,21 @@ import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.materni
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.database.icon.IconModel;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.databinding.ActivityEditBinding;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.FrameDialog;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.LoadingDialog;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.sticker.ClickStickerCallBack;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.sticker.StickerDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.crop.CropActivity;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.color.ColorModel;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.frame.FrameAdapter;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.sticker.StickerAdapter;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.start.IconClickCallBack;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.SPUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -53,9 +57,8 @@ import java.util.Objects;
 public class EditActivity extends BaseActivity<ActivityEditBinding> {
 
     String type;
-    Bitmap bitmap;
+    LoadingDialog loadingDialog;
     Drawable drawable;
-    int x, y;
     int state = 1;
     int alp = 255;
     private static final int RESULT_CODE_CHANGE_PHOTO = 1234;
@@ -114,41 +117,124 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                 category = ConstantApiData.MILESTONES;
             IconModel icon = IconDatabase.getInstance(this).iconDAO().getIconByCategoryAndSortASC(category, iconModel.getSortasc());
             if (icon != null)
-                Glide.with(this).load(icon.getUrl()).into(binding.ivBaby);
+                Glide.with(this).load(icon.getUrl()).into(binding.ivFrameEdit);
         } else {
             type = SPUtils.TYPE_EDIT;
             String imagePath = getIntent().getStringExtra("image_path");
             String imageUriString = getIntent().getStringExtra("image_uri");
             if (imageUriString != null) {
                 Uri imageUri = Uri.parse(imageUriString);
-                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.preview.getLayoutParams();
-                Size size = getImageSizeFromUri(imageUri);
-                if (size != null) {
-                    x = size.getWidth();
-                    y = size.getHeight();
-                } else {
-                    x = 412;
-                    y = 550;
-                }
-                params.dimensionRatio = x + ":" + y;
-                binding.preview.setLayoutParams(params);
-                binding.ivBaby.setImageURI(imageUri);
+                Glide.with(getBaseContext())
+                        .load(imageUri)
+                        .into(new CustomTarget<Drawable>() {
+                            @Override
+                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                                drawable = resource;
+                                DrawableSticker drawableSticker = new DrawableSticker(drawable, "");
+                                binding.stickerPhoto.removeAllStickers();
+                                binding.stickerPhoto.addSticker(drawableSticker);
+                                if (imagePath != null) {
+                                    File file = new File(imagePath);
+                                    // Xóa file sau khi load ảnh thành công
+                                    boolean deleted = file.delete();
+                                    if (deleted) {
+                                        Log.d("CacheCleanup", "File cache đã được xóa: " + imagePath);
+                                    } else {
+                                        Log.e("CacheCleanup", "Xóa file cache thất bại");
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+                                Toast.makeText(getBaseContext(), "fail", Toast.LENGTH_SHORT).show();
+                                if (imagePath != null) {
+                                    File file = new File(imagePath);
+                                    // Xóa file sau khi load ảnh thành công
+                                    boolean deleted = file.delete();
+                                    if (deleted) {
+                                        Log.d("CacheCleanup", "File cache đã được xóa: " + imagePath);
+                                    } else {
+                                        Log.e("CacheCleanup", "Xóa file cache thất bại");
+                                    }
+                                }
+                            }
+                        });
             } else Toast.makeText(this, "image uri: null", Toast.LENGTH_SHORT).show();
-            if (imagePath != null) {
-                File file = new File(imagePath);
-                // Xóa file sau khi load ảnh thành công
-                boolean deleted = file.delete();
-                if (deleted) {
-                    Log.d("CacheCleanup", "File cache đã được xóa: " + imagePath);
-                } else {
-                    Log.e("CacheCleanup", "Xóa file cache thất bại");
-                }
-            }
         }
         initData();
         binding.stickerView.setLocked(false);
         binding.stickerView.setConstrained(true);
+        binding.stickerPhoto.setLocked(false);
+        binding.stickerPhoto.setConstrained(true);
+        binding.stickerPhoto.setOnStickerOperationListener(new StickerView.OnStickerOperationListener() {
+            @Override
+            public void onStickerAdded(@NonNull Sticker sticker) {
+                state = STATE_MAIN_PHOTO;
+                changeState();
+            }
 
+            @Override
+            public void onStickerClicked(@NonNull Sticker sticker) {
+                state = STATE_MAIN_PHOTO;
+                changeState();
+            }
+
+            @Override
+            public void onStickerDeleted(@NonNull Sticker sticker) {
+
+            }
+
+            @Override
+            public void onStickerDragFinished(@NonNull Sticker sticker) {
+
+            }
+
+            @Override
+            public void onStickerTouchedDown(@NonNull Sticker sticker) {
+
+            }
+
+            @Override
+            public void onStickerZoomFinished(@NonNull Sticker sticker) {
+
+            }
+
+            @Override
+            public void onStickerFlipped(@NonNull Sticker sticker) {
+
+            }
+
+            @Override
+            public void onStickerDoubleTapped(@NonNull Sticker sticker) {
+
+            }
+
+            @Override
+            public void onStickerHideOptionIcon() {
+
+            }
+
+            @Override
+            public void onUndoDeleteSticker(@NonNull List<Sticker> stickers) {
+
+            }
+
+            @Override
+            public void onUndoUpdateSticker(@NonNull List<Sticker> stickers) {
+
+            }
+
+            @Override
+            public void onUndoDeleteAll() {
+
+            }
+
+            @Override
+            public void onReplaceSticker(@NonNull Sticker sticker) {
+
+            }
+        });
         binding.stickerView.setOnStickerOperationListener(new StickerView.OnStickerOperationListener() {
             @Override
             public void onStickerAdded(@NonNull Sticker sticker) {
@@ -267,12 +353,12 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             resultLauncher.launch(intent);
         });
         binding.llMainPhotoFlipH.setOnClickListener(view -> {
-            if (binding.ivBaby.getScaleX() == 1) binding.ivBaby.setScaleX(-1);
-            else binding.ivBaby.setScaleX(1);
+            binding.stickerPhoto.flip(binding.stickerPhoto.getStickers().get(0), StickerView.FLIP_HORIZONTALLY);
+            binding.stickerPhoto.invalidate();
         });
         binding.llMainPhotoFlipV.setOnClickListener(view -> {
-            if (binding.ivBaby.getScaleY() == 1) binding.ivBaby.setScaleY(-1);
-            else binding.ivBaby.setScaleY(1);
+            binding.stickerPhoto.flip(binding.stickerPhoto.getStickers().get(0), StickerView.FLIP_VERTICALLY);
+            binding.stickerPhoto.invalidate();
         });
         binding.clFrame.setOnClickListener(view -> {
             state = STATE_FRAME;
@@ -286,6 +372,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
         binding.clSticker.setOnClickListener(view -> {
             state = STATE_STICKER;
             changeState();
+            showStickerDialog();
         });
         binding.llStickerRemove.setOnClickListener(view -> {
             binding.stickerView.removeCurrentSticker();
@@ -315,7 +402,6 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
     }
 
 
-
     public ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
             //ads
@@ -334,11 +420,25 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                             drawable = resource;
                             DrawableSticker drawableSticker = new DrawableSticker(drawable, "");
                             binding.stickerView.addSticker(drawableSticker);
+                            File file = new File(imagePath);
+                            boolean deleted = file.delete();
+                            if (deleted) {
+                                Log.d("CacheCleanup", "File cache đã được xóa: " + imagePath);
+                            } else {
+                                Log.e("CacheCleanup", "Xóa file cache thất bại");
+                            }
                         }
 
                         @Override
                         public void onLoadCleared(@Nullable Drawable placeholder) {
                             Toast.makeText(getBaseContext(), "fail", Toast.LENGTH_SHORT).show();
+                            File file = new File(imagePath);
+                            boolean deleted = file.delete();
+                            if (deleted) {
+                                Log.d("CacheCleanup", "File cache đã được xóa: " + imagePath);
+                            } else {
+                                Log.e("CacheCleanup", "Xóa file cache thất bại");
+                            }
                         }
                     });
             SPUtils.setString(getBaseContext(), SPUtils.IMAGE_PATH, "");
@@ -349,29 +449,68 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             Log.e("check_crop_image", "path: " + imagePath);
             Log.e("check_crop_image", "imageuri: " + imageUriString);
             Uri imageUri = Uri.parse(imageUriString);
-            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.preview.getLayoutParams();
-            Size size = getImageSizeFromUri(imageUri);
-            if (size != null) {
-                x = size.getWidth();
-                y = size.getHeight();
-            } else {
-                x = 412;
-                y = 550;
-            }
-            params.dimensionRatio = x + ":" + y;
-            binding.preview.setLayoutParams(params);
-            binding.ivBaby.setImageURI(imageUri);
-            File file = new File(imagePath);
-            boolean deleted = file.delete();
-            if (deleted) {
-                Log.d("CacheCleanup", "File cache đã được xóa: " + imagePath);
-            } else {
-                Log.e("CacheCleanup", "Xóa file cache thất bại");
-            }
+            Glide.with(getBaseContext())
+                    .load(imageUri)
+                    .into(new CustomTarget<Drawable>() {
+                        @Override
+                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                            drawable = resource;
+                            DrawableSticker drawableSticker = new DrawableSticker(drawable, "");
+                            binding.stickerPhoto.removeAllStickers();
+                            binding.stickerPhoto.addSticker(drawableSticker);
+                            File file = new File(imagePath);
+                            boolean deleted = file.delete();
+                            if (deleted) {
+                                Log.d("CacheCleanup", "File cache đã được xóa: " + imagePath);
+                            } else {
+                                Log.e("CacheCleanup", "Xóa file cache thất bại");
+                            }
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                            Toast.makeText(getBaseContext(), "fail", Toast.LENGTH_SHORT).show();
+                            File file = new File(imagePath);
+                            boolean deleted = file.delete();
+                            if (deleted) {
+                                Log.d("CacheCleanup", "File cache đã được xóa: " + imagePath);
+                            } else {
+                                Log.e("CacheCleanup", "Xóa file cache thất bại");
+                            }
+                        }
+                    });
+
             SPUtils.setString(getBaseContext(), SPUtils.IMAGE_PATH, "");
             SPUtils.setString(getBaseContext(), SPUtils.IMAGE_URI, "");
         }
     });
+
+    private void loadImageFromURL(String urlString) {
+        showLoadingDialogEdit();
+        new Thread(() -> {
+            try {
+                URL url = new URL(urlString);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap bitmap = BitmapFactory.decodeStream(input);
+
+                runOnUiThread(() -> {
+                    dismissLoadingDialogEdit();
+                    if (bitmap != null) {
+                        Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+                        DrawableSticker drawableSticker = new DrawableSticker(drawable, "");
+                        binding.stickerView.addSticker(drawableSticker);
+                    } else {
+                        Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
 
     private void showFrameDialog() {
         FrameDialog frameDialog = new FrameDialog(this, false);
@@ -418,6 +557,107 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             @Override
             public void run() {
                 frameDialog.binding.rcvFrameList.setAdapter(frameAdapter);
+            }
+        });
+
+    }
+
+    private void showStickerDialog() {
+        StickerDialog frameDialog = new StickerDialog(this, false);
+        StickerAdapter stickerAdapter = new StickerAdapter(this, listMilestonesSticker, new IconClickCallBack() {
+            @Override
+            public void select(IconModel iconModel) {
+                loadImageFromURL(iconModel.getUrl());
+                frameDialog.dismiss();
+            }
+        });
+        frameDialog.init(new ClickStickerCallBack() {
+            @Override
+            public void milestone() {
+                stickerAdapter.setIconModelList(listMilestonesSticker);
+            }
+
+            @Override
+            public void accessory() {
+                stickerAdapter.setIconModelList(listAccessory);
+            }
+
+            @Override
+            public void alphabet() {
+                stickerAdapter.setIconModelList(listAlphabet);
+            }
+
+            @Override
+            public void shape() {
+                stickerAdapter.setIconModelList(listShape);
+            }
+
+            @Override
+            public void status() {
+                stickerAdapter.setIconModelList(listStatus);
+            }
+
+            @Override
+            public void motherday() {
+                stickerAdapter.setIconModelList(listMotherDay);
+            }
+
+            @Override
+            public void fatherday() {
+                stickerAdapter.setIconModelList(listFatherDay);
+            }
+
+            @Override
+            public void pregnancy() {
+                stickerAdapter.setIconModelList(listPregnancy);
+            }
+
+            @Override
+            public void toys() {
+                stickerAdapter.setIconModelList(listToys);
+            }
+
+            @Override
+            public void babyboy() {
+                stickerAdapter.setIconModelList(listBabyBoy);
+            }
+
+            @Override
+            public void babygirl() {
+                stickerAdapter.setIconModelList(listBabyGirl);
+            }
+
+            @Override
+            public void _1sttime() {
+                stickerAdapter.setIconModelList(list1stTime);
+            }
+
+            @Override
+            public void announcement() {
+                stickerAdapter.setIconModelList(listAnnouncement);
+            }
+
+            @Override
+            public void summer() {
+                stickerAdapter.setIconModelList(listSummer);
+            }
+
+            @Override
+            public void holiday() {
+                stickerAdapter.setIconModelList(listHolidaySticker);
+            }
+
+            @Override
+            public void newyear() {
+                stickerAdapter.setIconModelList(listNewYear);
+            }
+        });
+
+        frameDialog.show();
+        frameDialog.binding.rcvFrameList.post(new Runnable() {
+            @Override
+            public void run() {
+                frameDialog.binding.rcvFrameList.setAdapter(stickerAdapter);
             }
         });
 
@@ -471,6 +711,16 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
         setResult(RESULT_OK);
         finish();
     }
+
+    private void showLoadingDialogEdit() {
+        loadingDialog = new LoadingDialog(this, false);
+        loadingDialog.show();
+    }
+
+    private void dismissLoadingDialogEdit() {
+        if (loadingDialog != null && loadingDialog.isShowing()) loadingDialog.dismiss();
+    }
+
     private void initData() {
         listHolidayFrame = IconDatabase.getInstance(this).iconDAO().getIconByCategory(ConstantApiData.HOLIDAY_FRAME);
         listMilestonesFrame = IconDatabase.getInstance(this).iconDAO().getIconByCategory(ConstantApiData.MILESTONES);

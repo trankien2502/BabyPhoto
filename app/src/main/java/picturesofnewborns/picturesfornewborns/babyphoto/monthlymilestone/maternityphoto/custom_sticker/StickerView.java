@@ -252,38 +252,32 @@ public class StickerView extends FrameLayout {
             if (sticker != null) {
                 if (!sticker.isHide()) {
                     sticker.draw(canvas);
+                    if (sticker.getBorderWidth()!=0){
+                        getStickerPoints(sticker, bitmapPoints);
+                        borderPicturePaint.setStyle(Paint.Style.STROKE);
+                        borderPicturePaint.setColor(sticker.getColorBorder());
+                        borderPicturePaint.setAlpha(sticker.getAlpha());
+                        borderPicturePaint.setStrokeWidth(convertSpToPx(sticker.getBorderWidth(), context));
+                        float x1 = bitmapPoints[0] - dpTOpx(sticker.getBorderWidth());
+                        float y1 = bitmapPoints[1] - dpTOpx(sticker.getBorderWidth());
+                        float x2 = bitmapPoints[2] + dpTOpx(sticker.getBorderWidth());
+                        float y2 = bitmapPoints[3] - dpTOpx(sticker.getBorderWidth());
+                        float x3 = bitmapPoints[4] - dpTOpx(sticker.getBorderWidth());
+                        float y3 = bitmapPoints[5] + dpTOpx(sticker.getBorderWidth());
+                        float x4 = bitmapPoints[6] + dpTOpx(sticker.getBorderWidth());
+                        float y4 = bitmapPoints[7] + dpTOpx(sticker.getBorderWidth());
+                        Path path = new Path();
+                        path.moveTo(x1, y1);
+                        path.lineTo(x2, y2);
+                        path.lineTo(x4, y4);
+                        path.lineTo(x3, y3);
+                        path.close();
+                        canvas.drawPath(path, borderPicturePaint);
+                    }
                 }
             }
         }
-        if (handlingSticker != null && !locked && (showIcons)) {
-            getStickerPoints(handlingSticker, bitmapPoints);
-//            borderPicturePaint.setAntiAlias(true);
-            borderPicturePaint.setStyle(Paint.Style.STROKE);
-            borderPicturePaint.setColor(handlingSticker.getColorBorder());
-            borderPicturePaint.setAlpha(handlingSticker.getAlpha());
-            borderPicturePaint.setStrokeWidth(convertSpToPx(handlingSticker.getBorderWidth(), context));
-            float x1 = bitmapPoints[0];
-            float y1 = bitmapPoints[1];
-            float x2 = bitmapPoints[2];
-            float y2 = bitmapPoints[3];
-            float x3 = bitmapPoints[4];
-            float y3 = bitmapPoints[5];
-            float x4 = bitmapPoints[6];
-            float y4 = bitmapPoints[7];
-            Path path = new Path();
-            path.moveTo(x1, y1);
-            path.lineTo(x2, y2);
-            path.lineTo(x4, y4);
-            path.lineTo(x3, y3);
-//            path.lineTo(x1, y1);
-            path.close();
 
-            canvas.drawPath(path, borderPicturePaint);
-//            canvas.drawLine(x1, y1, x2, y2, borderPicturePaint);
-//            canvas.drawLine(x1, y1, x3, y3, borderPicturePaint);
-//            canvas.drawLine(x2, y2, x4, y4, borderPicturePaint);
-//            canvas.drawLine(x4, y4, x3, y3, borderPicturePaint);
-        }
         if (handlingSticker != null && !locked && (showBorder || showIcons)) {
             getStickerPoints(handlingSticker, bitmapPoints);
 
