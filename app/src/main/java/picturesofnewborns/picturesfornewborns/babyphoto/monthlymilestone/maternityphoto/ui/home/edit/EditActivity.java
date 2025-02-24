@@ -4,7 +4,9 @@ import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,14 +14,20 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.text.Layout;
 import android.util.Log;
 import android.util.Size;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -31,18 +39,34 @@ import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.materni
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.DrawableSticker;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.Sticker;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.StickerView;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.TextSticker;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.database.design.DesignDatabase;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.database.design.DesignModel;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.database.icon.IconDatabase;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.database.icon.IconModel;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.databinding.ActivityEditBinding;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.BorderDialog;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.FontDialog;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.FormatDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.FrameDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.LoadingDialog;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.OpacityDialog;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.TextDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.sticker.ClickStickerCallBack;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.sticker.StickerDialog;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.creation.DesignSuccessActivity;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.crop.CropActivity;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.color.ColorAdapter;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.color.ColorClickCallBack;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.color.ColorModel;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.font.FontAdapter;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.font.FontClickCallBack;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.font.FontModel;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.frame.FrameAdapter;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.sticker.StickerAdapter;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.start.IconClickCallBack;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.EventTracking;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.ImageUtils;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.SPUtils;
 
 import java.io.File;
@@ -59,8 +83,8 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
     String type;
     LoadingDialog loadingDialog;
     Drawable drawable;
+    boolean isAddPhoto = false;
     int state = 1;
-    int alp = 255;
     private static final int RESULT_CODE_CHANGE_PHOTO = 1234;
     private static final int RESULT_CODE_ADD_PHOTO = 5678;
     private static final int STATE_NONE = 0;
@@ -69,9 +93,11 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
     private static final int STATE_STICKER = 3;
     private static final int STATE_TEXT = 4;
     private static final int STATE_PHOTO = 5;
+    boolean isSave = false;
 
     List<IconModel> listHolidayFrame = new ArrayList<>();
     List<ColorModel> listColor = new ArrayList<>();
+    List<FontModel> listFont = new ArrayList<>();
     List<IconModel> listMilestonesFrame = new ArrayList<>();
     List<IconModel> listAITrendFrame = new ArrayList<>();
     List<IconModel> listMilestonesSticker = new ArrayList<>();
@@ -118,6 +144,8 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             IconModel icon = IconDatabase.getInstance(this).iconDAO().getIconByCategoryAndSortASC(category, iconModel.getSortasc());
             if (icon != null)
                 Glide.with(this).load(icon.getUrl()).into(binding.ivFrameEdit);
+            state = STATE_NONE;
+            changeState();
         } else {
             type = SPUtils.TYPE_EDIT;
             String imagePath = getIntent().getStringExtra("image_path");
@@ -133,6 +161,9 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                                 DrawableSticker drawableSticker = new DrawableSticker(drawable, "");
                                 binding.stickerPhoto.removeAllStickers();
                                 binding.stickerPhoto.addSticker(drawableSticker);
+                                binding.llAddPhoto.setVisibility(GONE);
+                                binding.ivBaby.setVisibility(GONE);
+                                isAddPhoto = true;
                                 if (imagePath != null) {
                                     File file = new File(imagePath);
                                     // Xóa file sau khi load ảnh thành công
@@ -172,12 +203,14 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             public void onStickerAdded(@NonNull Sticker sticker) {
                 state = STATE_MAIN_PHOTO;
                 changeState();
+                hideOption();
             }
 
             @Override
             public void onStickerClicked(@NonNull Sticker sticker) {
                 state = STATE_MAIN_PHOTO;
                 changeState();
+                hideOption();
             }
 
             @Override
@@ -239,7 +272,13 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             @Override
             public void onStickerAdded(@NonNull Sticker sticker) {
                 if (binding.stickerView.getCurrentSticker() != null) {
-                    state = STATE_STICKER;
+                    if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.STICKER) {
+                        state = STATE_STICKER;
+                    } else if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.PICTURE) {
+                        state = STATE_PHOTO;
+                    } else if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.TEXT) {
+                        state = STATE_TEXT;
+                    }
                     changeState();
                 }
             }
@@ -247,7 +286,13 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             @Override
             public void onStickerClicked(@NonNull Sticker sticker) {
                 if (binding.stickerView.getCurrentSticker() != null) {
-                    state = STATE_STICKER;
+                    if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.STICKER) {
+                        state = STATE_STICKER;
+                    } else if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.PICTURE) {
+                        state = STATE_PHOTO;
+                    } else if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.TEXT) {
+                        state = STATE_TEXT;
+                    }
                     changeState();
                 }
             }
@@ -261,7 +306,13 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             @Override
             public void onStickerDragFinished(@NonNull Sticker sticker) {
                 if (binding.stickerView.getCurrentSticker() != null) {
-                    state = STATE_STICKER;
+                    if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.STICKER) {
+                        state = STATE_STICKER;
+                    } else if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.PICTURE) {
+                        state = STATE_PHOTO;
+                    } else if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.TEXT) {
+                        state = STATE_TEXT;
+                    }
                     changeState();
                 }
             }
@@ -269,7 +320,13 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             @Override
             public void onStickerTouchedDown(@NonNull Sticker sticker) {
                 if (binding.stickerView.getCurrentSticker() != null) {
-                    state = STATE_STICKER;
+                    if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.STICKER) {
+                        state = STATE_STICKER;
+                    } else if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.PICTURE) {
+                        state = STATE_PHOTO;
+                    } else if (binding.stickerView.getCurrentSticker().getStickerType() == Sticker.StickerType.TEXT) {
+                        state = STATE_TEXT;
+                    }
                     changeState();
                 }
             }
@@ -336,18 +393,48 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
 
     @Override
     public void bindView() {
+        binding.stickerPhoto.setOnClickListener(v -> {
+
+        });
         binding.ivBack.setOnClickListener(view -> {
             onBack();
         });
         binding.tvSave.setOnClickListener(view -> {
-
+            isSave = true;
+            EventTracking.logEvent(getBaseContext(), "design_done_click");
+            hideOption();
+            DesignModel designModel;
+            Bitmap bitmap = ImageUtils.captureViewBitmap(binding.preview);
+            String fileName = "IMG_DESIGN_" + System.currentTimeMillis() + ".png";
+            ImageUtils.saveImageToInternalStorage(this, bitmap, fileName);
+            String path = ImageUtils.getImagePathFromInternalStorage(this, fileName);
+            if (path != null) {
+                designModel = new DesignModel(path);
+                DesignDatabase.getInstance(this).designDAO().insert(designModel);
+                Intent intent = new Intent(this, DesignSuccessActivity.class);
+                intent.putExtra("DESIGN_IMAGE", path);
+                resultLauncher.launch(intent);
+            } else {
+                Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+            }
         });
         binding.preview.setOnClickListener(view -> {
-            hideOption();
-            state = STATE_MAIN_PHOTO;
-            changeState();
+            if (isAddPhoto) {
+                hideOption();
+                state = STATE_MAIN_PHOTO;
+                changeState();
+            } else {
+                Intent intent = new Intent(this, CropActivity.class);
+                intent.putExtra("CROP_IMAGE_STATUS", RESULT_CODE_CHANGE_PHOTO);
+                resultLauncher.launch(intent);
+            }
         });
         binding.llChangePhoto.setOnClickListener(view -> {
+            Intent intent = new Intent(this, CropActivity.class);
+            intent.putExtra("CROP_IMAGE_STATUS", RESULT_CODE_CHANGE_PHOTO);
+            resultLauncher.launch(intent);
+        });
+        binding.llAddPhoto.setOnClickListener(view -> {
             Intent intent = new Intent(this, CropActivity.class);
             intent.putExtra("CROP_IMAGE_STATUS", RESULT_CODE_CHANGE_PHOTO);
             resultLauncher.launch(intent);
@@ -366,8 +453,25 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             showFrameDialog();
         });
         binding.clText.setOnClickListener(view -> {
-            state = STATE_TEXT;
-            changeState();
+            showTextDialog();
+        });
+        binding.llTextRemove.setOnClickListener(view -> {
+            binding.stickerView.removeCurrentSticker();
+        });
+        binding.llTextEdit.setOnClickListener(view -> {
+            showTextEditDialog();
+        });
+        binding.llTextFont.setOnClickListener(view -> {
+            showFontDialog();
+        });
+        binding.llTextFomart.setOnClickListener(view -> {
+            showFormatDialog();
+        });
+        binding.llTextShadow.setOnClickListener(view -> {
+            showShadowDialog();
+        });
+        binding.llTextBackground.setOnClickListener(view -> {
+            showBackgroundDialog();
         });
         binding.clSticker.setOnClickListener(view -> {
             state = STATE_STICKER;
@@ -384,11 +488,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             binding.stickerView.flipCurrentSticker(StickerView.FLIP_VERTICALLY);
         });
         binding.llStickerOpacity.setOnClickListener(view -> {
-            alp -= 20;
-            if (binding.stickerView.getCurrentSticker() != null) {
-                binding.stickerView.getCurrentSticker().setAlpha((alp > 0 ? alp : 1));
-                binding.stickerView.invalidate();
-            }
+            showOpacityDialog();
         });
 
         binding.clPhoto.setOnClickListener(view -> {
@@ -396,8 +496,23 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             intent.putExtra("CROP_IMAGE_STATUS", RESULT_CODE_ADD_PHOTO);
             resultLauncher.launch(intent);
         });
-        binding.llPhotoOpacity.setOnClickListener(view -> {
-
+        binding.llPhotoRemove.setOnClickListener(view -> {
+            binding.stickerView.removeCurrentSticker();
+        });
+        binding.llPhotoFlipH.setOnClickListener(v -> {
+            binding.stickerView.flipCurrentSticker(StickerView.FLIP_HORIZONTALLY);
+        });
+        binding.llPhotoFlipV.setOnClickListener(v -> {
+            binding.stickerView.flipCurrentSticker(StickerView.FLIP_VERTICALLY);
+        });
+        binding.llPhotoFilter.setOnClickListener(v -> {
+            showFilterDialog();
+        });
+        binding.llPhotoOpacity.setOnClickListener(v -> {
+            showOpacityDialog();
+        });
+        binding.llPhotoBorder.setOnClickListener(v -> {
+            showBorderDialog();
         });
     }
 
@@ -419,6 +534,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                         public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                             drawable = resource;
                             DrawableSticker drawableSticker = new DrawableSticker(drawable, "");
+                            drawableSticker.setStickerType(Sticker.StickerType.PICTURE);
                             binding.stickerView.addSticker(drawableSticker);
                             File file = new File(imagePath);
                             boolean deleted = file.delete();
@@ -431,7 +547,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
 
                         @Override
                         public void onLoadCleared(@Nullable Drawable placeholder) {
-                            Toast.makeText(getBaseContext(), "fail", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), R.string.load_image_failed, Toast.LENGTH_SHORT).show();
                             File file = new File(imagePath);
                             boolean deleted = file.delete();
                             if (deleted) {
@@ -458,6 +574,9 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                             DrawableSticker drawableSticker = new DrawableSticker(drawable, "");
                             binding.stickerPhoto.removeAllStickers();
                             binding.stickerPhoto.addSticker(drawableSticker);
+                            binding.llAddPhoto.setVisibility(GONE);
+                            binding.ivBaby.setVisibility(GONE);
+                            isAddPhoto = true;
                             File file = new File(imagePath);
                             boolean deleted = file.delete();
                             if (deleted) {
@@ -469,7 +588,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
 
                         @Override
                         public void onLoadCleared(@Nullable Drawable placeholder) {
-                            Toast.makeText(getBaseContext(), "fail", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), R.string.load_image_failed, Toast.LENGTH_SHORT).show();
                             File file = new File(imagePath);
                             boolean deleted = file.delete();
                             if (deleted) {
@@ -501,6 +620,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                     if (bitmap != null) {
                         Drawable drawable = new BitmapDrawable(getResources(), bitmap);
                         DrawableSticker drawableSticker = new DrawableSticker(drawable, "");
+                        drawableSticker.setStickerType(Sticker.StickerType.STICKER);
                         binding.stickerView.addSticker(drawableSticker);
                     } else {
                         Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
@@ -510,6 +630,448 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    private void showFormatDialog() {
+        FormatDialog dialog = new FormatDialog(this, false);
+        TextSticker sticker = (TextSticker) binding.stickerView.getCurrentSticker();
+        if (sticker != null) {
+
+            final int[] color = {Color.BLACK};
+            int position = 0;
+            color[0] = sticker.getColorText();
+            for (int i = 0; i < listColor.size(); i++) {
+                ColorModel colorModel = listColor.get(i);
+                colorModel.setSelect(colorModel.getColor() == color[0]);
+                if (colorModel.getColor() == color[0]) position = i;
+            }
+            ColorAdapter colorAdapter = new ColorAdapter(this, listColor, new ColorClickCallBack() {
+                @Override
+                public void select(ColorModel colorModel) {
+                    color[0] = colorModel.getColor();
+                }
+            });
+
+            dialog.binding.sbOpacity.setProgress(sticker != null ? binding.stickerView.getCurrentSticker().getAlpha() : 0);
+            dialog.binding.ivBack.setOnClickListener(view -> {
+                dialog.dismiss();
+            });
+            dialog.binding.ivGone.setOnClickListener(view -> {
+                if (binding.stickerView.getCurrentSticker() != null) {
+                    ((TextSticker) binding.stickerView.getCurrentSticker()).setColorText(color[0]);
+                    binding.stickerView.getCurrentSticker().setAlpha(dialog.binding.sbOpacity.getProgress());
+                    binding.stickerView.invalidate();
+                }
+                dialog.dismiss();
+            });
+            dialog.binding.ivBold.setOnClickListener(v -> {
+                ((TextSticker) binding.stickerView.getCurrentSticker()).setBold(!((TextSticker) binding.stickerView.getCurrentSticker()).isBold());
+            });
+            dialog.binding.ivItalic.setOnClickListener(v -> {
+                ((TextSticker) binding.stickerView.getCurrentSticker()).setItalic(!((TextSticker) binding.stickerView.getCurrentSticker()).isItalic());
+            });
+            dialog.binding.ivCross.setOnClickListener(v -> {
+                ((TextSticker) binding.stickerView.getCurrentSticker()).setLineCentral(!((TextSticker) binding.stickerView.getCurrentSticker()).isLineCentral());
+            });
+            dialog.binding.ivUnderline.setOnClickListener(v -> {
+                ((TextSticker) binding.stickerView.getCurrentSticker()).setUnderLine(!((TextSticker) binding.stickerView.getCurrentSticker()).isUnderLine());
+            });
+            dialog.binding.ivStart.setOnClickListener(v -> {
+                ((TextSticker) binding.stickerView.getCurrentSticker()).setTextAlign(Layout.Alignment.ALIGN_NORMAL);
+            });
+            dialog.binding.ivCenter.setOnClickListener(v -> {
+                ((TextSticker) binding.stickerView.getCurrentSticker()).setTextAlign(Layout.Alignment.ALIGN_CENTER);
+            });
+            dialog.binding.ivOpposite.setOnClickListener(v -> {
+                ((TextSticker) binding.stickerView.getCurrentSticker()).setTextAlign(Layout.Alignment.ALIGN_OPPOSITE);
+            });
+            dialog.binding.sbOpacity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+            dialog.show();
+            int finalPosition = position;
+            dialog.binding.rcvColor.post(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.binding.rcvColor.setAdapter(colorAdapter);
+                    dialog.binding.rcvColor.smoothScrollToPosition(finalPosition);
+                }
+            });
+        } else {
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void showShadowDialog() {
+        BorderDialog dialog = new BorderDialog(this, false);
+        dialog.binding.tvTitle.setText(R.string.shadow);
+        dialog.binding.iv1.setImageResource(R.drawable.design);
+        dialog.binding.sbBorder.setMax(255);
+        TextSticker sticker = (TextSticker) binding.stickerView.getCurrentSticker();
+        final int[] color = {Color.BLACK};
+        int position = 0;
+        if (sticker != null) {
+            color[0] = sticker.getColorShadow();
+            for (int i = 0; i < listColor.size(); i++) {
+                ColorModel colorModel = listColor.get(i);
+                colorModel.setSelect(colorModel.getColor() == color[0]);
+                if (colorModel.getColor() == color[0]) position = i;
+            }
+        }
+        ColorAdapter colorAdapter = new ColorAdapter(this, listColor, new ColorClickCallBack() {
+            @Override
+            public void select(ColorModel colorModel) {
+                color[0] = colorModel.getColor();
+            }
+        });
+
+        dialog.binding.sbBorder.setProgress(sticker != null ? sticker.getAlphaBackground() : 0);
+        dialog.binding.ivBack.setOnClickListener(view -> {
+            dialog.dismiss();
+        });
+        dialog.binding.ivGone.setOnClickListener(view -> {
+            if (binding.stickerView.getCurrentSticker() != null) {
+                ((TextSticker) binding.stickerView.getCurrentSticker()).setColorShadow(color[0]);
+                binding.stickerView.invalidate();
+            }
+            dialog.dismiss();
+        });
+        dialog.binding.sbBorder.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        dialog.show();
+        int finalPosition = position;
+        dialog.binding.rcvColor.post(new Runnable() {
+            @Override
+            public void run() {
+                dialog.binding.rcvColor.setAdapter(colorAdapter);
+                dialog.binding.rcvColor.smoothScrollToPosition(finalPosition);
+            }
+        });
+    }
+
+    private void showFontDialog() {
+        FontDialog dialog = new FontDialog(this, false);
+        TextSticker sticker = (TextSticker) binding.stickerView.getCurrentSticker();
+        if (sticker != null) {
+            final String[] font = {""};
+            int position = 0;
+            font[0] = sticker.getTypeface();
+            for (int i = 0; i < listFont.size(); i++) {
+                if (Objects.equals(font[0], listFont.get(i).getFontPath())) position = i;
+            }
+
+            FontAdapter fontAdapter = new FontAdapter(this, listFont, new FontClickCallBack() {
+                @Override
+                public void select(FontModel fontModel) {
+                    font[0] = fontModel.getFontPath();
+                }
+            });
+
+            dialog.binding.ivBack.setOnClickListener(view -> {
+                dialog.dismiss();
+            });
+            dialog.binding.ivGone.setOnClickListener(view -> {
+                ((TextSticker) binding.stickerView.getCurrentSticker()).setTypeface(font[0]);
+                binding.stickerView.invalidate();
+                dialog.dismiss();
+            });
+            dialog.show();
+            int finalPosition = position;
+            dialog.binding.rcvFont.post(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.binding.rcvFont.setAdapter(fontAdapter);
+                    dialog.binding.rcvFont.smoothScrollToPosition(finalPosition);
+                }
+            });
+        } else {
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showBackgroundDialog() {
+        BorderDialog dialog = new BorderDialog(this, false);
+        dialog.binding.tvTitle.setText(R.string.background_color);
+        dialog.binding.iv1.setImageResource(R.drawable.design);
+        dialog.binding.sbBorder.setMax(255);
+        Sticker sticker = binding.stickerView.getCurrentSticker();
+        final int[] color = {Color.BLACK};
+        int position = 0;
+        if (sticker != null) {
+            color[0] = sticker.getColorBackground();
+            for (int i = 0; i < listColor.size(); i++) {
+                ColorModel colorModel = listColor.get(i);
+                colorModel.setSelect(colorModel.getColor() == color[0]);
+                if (colorModel.getColor() == color[0]) position = i;
+            }
+        }
+        ColorAdapter colorAdapter = new ColorAdapter(this, listColor, new ColorClickCallBack() {
+            @Override
+            public void select(ColorModel colorModel) {
+                color[0] = colorModel.getColor();
+            }
+        });
+
+        dialog.binding.sbBorder.setProgress(sticker != null ? sticker.getAlphaBackground() : 0);
+        dialog.binding.ivBack.setOnClickListener(view -> {
+            dialog.dismiss();
+        });
+        dialog.binding.ivGone.setOnClickListener(view -> {
+            if (binding.stickerView.getCurrentSticker() != null) {
+                binding.stickerView.getCurrentSticker().setAlphaBackground(dialog.binding.sbBorder.getProgress());
+                binding.stickerView.getCurrentSticker().setColorBackground(color[0]);
+                binding.stickerView.invalidate();
+            }
+            dialog.dismiss();
+        });
+        dialog.binding.sbBorder.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        dialog.show();
+        int finalPosition = position;
+        dialog.binding.rcvColor.post(new Runnable() {
+            @Override
+            public void run() {
+                dialog.binding.rcvColor.setAdapter(colorAdapter);
+                dialog.binding.rcvColor.smoothScrollToPosition(finalPosition);
+            }
+        });
+    }
+
+    private void showBorderDialog() {
+        BorderDialog dialog = new BorderDialog(this, false);
+        Sticker sticker = binding.stickerView.getCurrentSticker();
+        final int[] color = {Color.BLACK};
+        int position = 0;
+        if (sticker != null) {
+            color[0] = sticker.getColorBorder();
+            for (int i = 0; i < listColor.size(); i++) {
+                ColorModel colorModel = listColor.get(i);
+                colorModel.setSelect(colorModel.getColor() == color[0]);
+                if (colorModel.getColor() == color[0]) position = i;
+            }
+        }
+        ColorAdapter colorAdapter = new ColorAdapter(this, listColor, new ColorClickCallBack() {
+            @Override
+            public void select(ColorModel colorModel) {
+                color[0] = colorModel.getColor();
+            }
+        });
+
+        dialog.binding.sbBorder.setProgress(sticker != null ? sticker.getBorderWidth() : 0);
+        dialog.binding.ivBack.setOnClickListener(view -> {
+            dialog.dismiss();
+        });
+        dialog.binding.ivGone.setOnClickListener(view -> {
+            if (binding.stickerView.getCurrentSticker() != null) {
+                binding.stickerView.getCurrentSticker().setBorderWidth(dialog.binding.sbBorder.getProgress());
+                binding.stickerView.getCurrentSticker().setColorBorder(color[0]);
+                binding.stickerView.invalidate();
+            }
+            dialog.dismiss();
+        });
+        dialog.binding.sbBorder.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        dialog.show();
+        int finalPosition = position;
+        dialog.binding.rcvColor.post(new Runnable() {
+            @Override
+            public void run() {
+                dialog.binding.rcvColor.setAdapter(colorAdapter);
+                dialog.binding.rcvColor.smoothScrollToPosition(finalPosition);
+            }
+        });
+    }
+
+    public void showKeyboard(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        view.requestFocus();
+        view.postDelayed(() -> imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT), 100);
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void showTextEditDialog() {
+        TextDialog dialog = new TextDialog(this, false);
+        TextSticker sticker = (TextSticker) binding.stickerView.getCurrentSticker();
+        if (sticker != null) {
+            dialog.binding.edtText.setText(sticker.getText());
+            dialog.binding.edtText.requestFocus();
+            showKeyboard(this, dialog.binding.edtText);
+            dialog.binding.edtText.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    showKeyboard(this, dialog.binding.edtText);
+                }
+                return false;
+            });
+            dialog.binding.ivClose.setOnClickListener(view -> {
+                dialog.dismiss();
+            });
+            dialog.binding.ivDone.setOnClickListener(view -> {
+                if (!dialog.binding.edtText.getText().toString().trim().isEmpty()) {
+                    ((TextSticker) binding.stickerView.getCurrentSticker()).setText(dialog.binding.edtText.getText().toString().trim());
+                    binding.stickerView.invalidate();
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(getBaseContext(), R.string.please_entry_text, Toast.LENGTH_SHORT).show();
+                }
+
+            });
+            dialog.show();
+        } else {
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void showTextDialog() {
+        TextDialog dialog = new TextDialog(this, false);
+        dialog.binding.edtText.requestFocus();
+        showKeyboard(this, dialog.binding.edtText);
+        dialog.binding.edtText.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                showKeyboard(this, dialog.binding.edtText);
+            }
+            return false;
+        });
+        dialog.binding.ivClose.setOnClickListener(view -> {
+            dialog.dismiss();
+        });
+        dialog.binding.ivDone.setOnClickListener(view -> {
+            if (!dialog.binding.edtText.getText().toString().trim().isEmpty()) {
+                TextSticker textSticker = new TextSticker(this)
+                        .setText(dialog.binding.edtText.getText().toString().trim())
+                        .setAlpha(255)
+                        .resizeText();
+                textSticker.setStickerType(Sticker.StickerType.TEXT);
+                binding.stickerView.addSticker(textSticker);
+                dialog.dismiss();
+            } else {
+                Toast.makeText(getBaseContext(), R.string.please_entry_text, Toast.LENGTH_SHORT).show();
+            }
+
+        });
+        dialog.show();
+    }
+
+    private void showFilterDialog() {
+        OpacityDialog dialog = new OpacityDialog(this, false);
+        Sticker sticker = binding.stickerView.getCurrentSticker();
+        dialog.binding.sbOpacity.setProgress(sticker != null ? sticker.getAlpha() : 255);
+        dialog.binding.ivBack.setOnClickListener(view -> {
+            dialog.dismiss();
+        });
+        dialog.binding.ivGone.setOnClickListener(view -> {
+            if (binding.stickerView.getCurrentSticker() != null) {
+                binding.stickerView.getCurrentSticker().setAlpha(dialog.binding.sbOpacity.getProgress());
+                binding.stickerView.invalidate();
+            }
+            dialog.dismiss();
+        });
+        dialog.binding.sbOpacity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        dialog.show();
+    }
+
+    private void showOpacityDialog() {
+        OpacityDialog dialog = new OpacityDialog(this, false);
+        Sticker sticker = binding.stickerView.getCurrentSticker();
+        dialog.binding.sbOpacity.setProgress(sticker != null ? sticker.getAlpha() : 255);
+        dialog.binding.ivBack.setOnClickListener(view -> {
+            dialog.dismiss();
+        });
+        dialog.binding.ivGone.setOnClickListener(view -> {
+            if (binding.stickerView.getCurrentSticker() != null) {
+                binding.stickerView.getCurrentSticker().setAlpha(dialog.binding.sbOpacity.getProgress());
+                binding.stickerView.invalidate();
+            }
+            dialog.dismiss();
+        });
+        dialog.binding.sbOpacity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        dialog.show();
     }
 
     private void showFrameDialog() {
@@ -801,5 +1363,15 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
         listColor.add(new ColorModel(Color.parseColor("#E500E5")));
         listColor.add(new ColorModel(Color.parseColor("#B200B2")));
         listColor.add(new ColorModel(Color.parseColor("#660066")));
+        listFont.add(new FontModel("font/aeonik_pro_regular.otf"));
+        listFont.add(new FontModel("font/baloo2_edium.ttf"));
+        listFont.add(new FontModel("font/be_vietnam_pro.ttf"));
+        listFont.add(new FontModel("font/bowlby_one_sc.ttf"));
+        listFont.add(new FontModel("font/druk_text_wide_medium_trial.otf"));
+        listFont.add(new FontModel("font/galada.ttf"));
+        listFont.add(new FontModel("font/gamja_flower.ttf"));
+        listFont.add(new FontModel("font/ghochi_hand.ttf"));
+        listFont.add(new FontModel("font/grand_hotel.ttf"));
+        listFont.add(new FontModel("font/gurajada.ttf"));
     }
 }

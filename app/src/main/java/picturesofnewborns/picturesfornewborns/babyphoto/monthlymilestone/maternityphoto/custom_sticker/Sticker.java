@@ -33,6 +33,15 @@ public abstract class Sticker {
         int RIGHT = 1 << 3;
         int BOTTOM = 1 << 4;
     }
+    @IntDef(flag = true, value = {
+            StickerType.STICKER, StickerType.PICTURE, StickerType.TEXT
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface StickerType {
+        int STICKER = 1;
+        int PICTURE = 1 << 1;
+        int TEXT = 1 << 2;
+    }
 
     private final float[] matrixValues = new float[9];
     private final float[] unrotatedWrapperCorner = new float[8];
@@ -44,8 +53,11 @@ public abstract class Sticker {
     private boolean isFlippedHorizontally;
     private boolean isFlippedVertically;
     private boolean isLock;
+    private int stickerType = StickerType.STICKER;
     private int colorBorder = Color.BLACK;
-    private float borderWidth = 0f;
+    private int colorBackground =  Color.BLACK;
+    private int alphaBackground =  0;
+    private int borderWidth = 0;
     private int pagerSelect;//pager : face, eyes...
     private int posSelect;// pos: vị trí chọn của list face(vd: face1, face2)
 
@@ -85,21 +97,45 @@ public abstract class Sticker {
         return this;
     }
 
-    public float getBorderWidth() {
+    public int getBorderWidth() {
         return borderWidth;
     }
 
-    public Sticker setBorderWidth(float borderWidth) {
+    public Sticker setBorderWidth(int borderWidth) {
         this.borderWidth = borderWidth;
         return this;
     }
+    public int getStickerType() {
+        return stickerType;
+    }
 
+    public Sticker setStickerType(int type) {
+        this.stickerType = type;
+        return this;
+    }
     public int getColorBorder() {
         return colorBorder;
     }
 
     public Sticker setColorBorder(int colorBorder) {
         this.colorBorder = colorBorder;
+        return this;
+    }
+    public int getColorBackground() {
+        return colorBackground;
+    }
+
+    public Sticker setColorBackground(int colorBorder) {
+        this.colorBackground = colorBorder;
+        return this;
+    }
+
+    public int getAlphaBackground() {
+        return alphaBackground;
+    }
+
+    public Sticker setAlphaBackground(int colorBorder) {
+        this.alphaBackground = colorBorder;
         return this;
     }
 

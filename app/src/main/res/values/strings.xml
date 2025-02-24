@@ -87,6 +87,7 @@
     <string name="shadow">Shadow</string>
     <string name="format">Format</string>
     <string name="background">Background</string>
+    <string name="background_color">Background Color</string>
     <string name="remove">Remove</string>
     <string name="filter">Filter</string>
     <string name="border">Border</string>
@@ -109,6 +110,20 @@
     <string name="summer">Summer</string>
     <string name="new_year">New year</string>
     <string name="error">Error\n</string>
+    <string name="load_image_failed">Load image failed!</string>
+    <string name="tap_to_add_photo">Tap to add photo</string>
+    <string name="download_success">Download successfully!</string>
+    <string name="download_failed">Download failed!</string>
+    <string name="delete_">Delete?</string>
+    <string name="delete">Delete</string>
+    <string name="are_you_sure_you_want_to_delete_this_photo">Are you sure you want to delete this photo?</string>
+    <string name="failed_to_get_image">Failed to get image!</string>
+    <string name="view">View</string>
+    <string name="download">Download\n</string>
+    <string name="result">Result</string>
+    <string name="enter_text">"Enter text "</string>
+    <string name="please_entry_text">Please entry text!</string>
+    <string name="font_style">Font Style</string>
 
 
 </resources>

@@ -5,6 +5,8 @@ import static android.view.View.VISIBLE;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,11 +64,13 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.IconViewHold
         return new IconViewHolder(itemColorModelBinding);
     }
 
+    @SuppressLint("ResourceType")
     @Override
     public void onBindViewHolder(@NonNull IconViewHolder holder, int position) {
         ColorModel iconModel = iconModelList.get(position);
         if (iconModel.isSelect()) holder.binding.ivSelect.setVisibility(VISIBLE);
         else holder.binding.ivSelect.setVisibility(GONE);
+        holder.binding.ivColor.setColorFilter(iconModel.getColor(), PorterDuff.Mode.SRC_IN);
         holder.binding.layoutItem.setOnClickListener(view -> {
             setCheck(iconModel);
             iconClickCallBack.select(iconModel);

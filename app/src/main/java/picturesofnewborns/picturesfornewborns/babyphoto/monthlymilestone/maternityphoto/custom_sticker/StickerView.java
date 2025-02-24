@@ -41,6 +41,8 @@ public class StickerView extends FrameLayout {
     Context context;
     private final boolean showIcons;
     private final boolean showBorder;
+
+//    private boolean s
     private final boolean bringToFrontCurrentSticker;
 
     @IntDef({
@@ -76,6 +78,7 @@ public class StickerView extends FrameLayout {
     private List<Sticker> listUndoTemp = new ArrayList<>();
 
     private final Paint borderPaint = new Paint();
+    private final Paint backgoundPaint = new Paint();
     private final Paint borderPicturePaint = new Paint();
     private final RectF stickerRect = new RectF();
 
@@ -162,21 +165,53 @@ public class StickerView extends FrameLayout {
         BitmapStickerIcon rotateIcon = new BitmapStickerIcon(
                 ContextCompat.getDrawable(getContext(), R.drawable.ellipse_8),
                 BitmapStickerIcon.RIGHT_TOP, context);
-//        rotateIcon.setIconEvent(new RotateIconEvent());
+        rotateIcon.setIconEvent(new ZoomIconEvent());
 
         BitmapStickerIcon deleteIcon = new BitmapStickerIcon(
                 ContextCompat.getDrawable(getContext(), R.drawable.ellipse_8),
                 BitmapStickerIcon.LEFT_TOP, context);
-//        deleteIcon.setIconEvent(new DeleteIconEvent());
+        deleteIcon.setIconEvent(new ZoomIconEvent());
 
         BitmapStickerIcon zoomIcon = new BitmapStickerIcon(
                 ContextCompat.getDrawable(getContext(), R.drawable.ellipse_8),
                 BitmapStickerIcon.RIGHT_BOTOM, context);
-//        zoomIcon.setIconEvent(new ZoomIconEvent());
+        zoomIcon.setIconEvent(new ZoomIconEvent());
         BitmapStickerIcon flipIcon = new BitmapStickerIcon(
                 ContextCompat.getDrawable(getContext(), R.drawable.ellipse_8),
                 BitmapStickerIcon.LEFT_BOTTOM, context);
-//        flipIcon.setIconEvent(new FlipHorizontallyEvent());
+        flipIcon.setIconEvent(new ZoomIconEvent());
+
+        icons.clear();
+        icons.add(deleteIcon);
+        icons.add(zoomIcon);
+        icons.add(rotateIcon);
+        icons.add(flipIcon);
+//            }
+//        }
+
+    }
+    public void configDefaultIconsInvisible(Context context) {
+//        for (Sticker sticker : stickers) {
+//            Log.d("checkDragCurrent", "3,matrix: " + sticker.getMatrix().toString());
+//            if (sticker instanceof DrawableSticker) {
+        BitmapStickerIcon rotateIcon = new BitmapStickerIcon(
+                ContextCompat.getDrawable(getContext(), R.drawable.ellipse_133),
+                BitmapStickerIcon.RIGHT_TOP, context);
+        rotateIcon.setIconEvent(new ZoomIconEvent());
+
+        BitmapStickerIcon deleteIcon = new BitmapStickerIcon(
+                ContextCompat.getDrawable(getContext(), R.drawable.ellipse_133),
+                BitmapStickerIcon.LEFT_TOP, context);
+        deleteIcon.setIconEvent(new ZoomIconEvent());
+
+        BitmapStickerIcon zoomIcon = new BitmapStickerIcon(
+                ContextCompat.getDrawable(getContext(), R.drawable.ellipse_133),
+                BitmapStickerIcon.RIGHT_BOTOM, context);
+        zoomIcon.setIconEvent(new ZoomIconEvent());
+        BitmapStickerIcon flipIcon = new BitmapStickerIcon(
+                ContextCompat.getDrawable(getContext(), R.drawable.ellipse_133),
+                BitmapStickerIcon.LEFT_BOTTOM, context);
+        flipIcon.setIconEvent(new ZoomIconEvent());
 
         icons.clear();
         icons.add(deleteIcon);
@@ -251,29 +286,39 @@ public class StickerView extends FrameLayout {
             Sticker sticker = stickers.get(i);
             if (sticker != null) {
                 if (!sticker.isHide()) {
+                    getStickerPoints(sticker, bitmapPoints);
+                    float x1 = bitmapPoints[0] - 0;//dpTOpx(sticker.getBorderWidth())
+                    float y1 = bitmapPoints[1] - 0;
+                    float x2 = bitmapPoints[2] + 0;
+                    float y2 = bitmapPoints[3] - 0;
+                    float x3 = bitmapPoints[4] - 0;
+                    float y3 = bitmapPoints[5] + 0;
+                    float x4 = bitmapPoints[6] + 0;
+                    float y4 = bitmapPoints[7] + 0;
+                    Path path = new Path();
+                    path.moveTo(x1, y1);
+                    path.lineTo(x2, y2);
+                    path.lineTo(x4, y4);
+                    path.lineTo(x3, y3);
+                    path.close();
+                    if (sticker.getStickerType()== Sticker.StickerType.TEXT){
+                        backgoundPaint.setStyle(Paint.Style.FILL);
+                        backgoundPaint.setColor(sticker.getColorBackground());
+                        backgoundPaint.setAlpha(sticker.getAlphaBackground());
+                        canvas.drawPath(path, backgoundPaint);
+                    }
+                    if (sticker.getStickerType()== Sticker.StickerType.TEXT){
+                        ((TextSticker) sticker).resizeText();
+                    }
                     sticker.draw(canvas);
                     if (sticker.getBorderWidth()!=0){
-                        getStickerPoints(sticker, bitmapPoints);
                         borderPicturePaint.setStyle(Paint.Style.STROKE);
                         borderPicturePaint.setColor(sticker.getColorBorder());
                         borderPicturePaint.setAlpha(sticker.getAlpha());
                         borderPicturePaint.setStrokeWidth(convertSpToPx(sticker.getBorderWidth(), context));
-                        float x1 = bitmapPoints[0] - dpTOpx(sticker.getBorderWidth());
-                        float y1 = bitmapPoints[1] - dpTOpx(sticker.getBorderWidth());
-                        float x2 = bitmapPoints[2] + dpTOpx(sticker.getBorderWidth());
-                        float y2 = bitmapPoints[3] - dpTOpx(sticker.getBorderWidth());
-                        float x3 = bitmapPoints[4] - dpTOpx(sticker.getBorderWidth());
-                        float y3 = bitmapPoints[5] + dpTOpx(sticker.getBorderWidth());
-                        float x4 = bitmapPoints[6] + dpTOpx(sticker.getBorderWidth());
-                        float y4 = bitmapPoints[7] + dpTOpx(sticker.getBorderWidth());
-                        Path path = new Path();
-                        path.moveTo(x1, y1);
-                        path.lineTo(x2, y2);
-                        path.lineTo(x4, y4);
-                        path.lineTo(x3, y3);
-                        path.close();
                         canvas.drawPath(path, borderPicturePaint);
                     }
+
                 }
             }
         }
@@ -281,14 +326,14 @@ public class StickerView extends FrameLayout {
         if (handlingSticker != null && !locked && (showBorder || showIcons)) {
             getStickerPoints(handlingSticker, bitmapPoints);
 
-            float x1 = bitmapPoints[0] - dpTOpx(5f);
-            float y1 = bitmapPoints[1] - dpTOpx(5f);
-            float x2 = bitmapPoints[2] + dpTOpx(5f);
-            float y2 = bitmapPoints[3] - dpTOpx(5f);
-            float x3 = bitmapPoints[4] - dpTOpx(5f);
-            float y3 = bitmapPoints[5] + dpTOpx(5f);
-            float x4 = bitmapPoints[6] + dpTOpx(5f);
-            float y4 = bitmapPoints[7] + dpTOpx(5f);
+            float x1 = bitmapPoints[0];
+            float y1 = bitmapPoints[1];
+            float x2 = bitmapPoints[2];
+            float y2 = bitmapPoints[3];
+            float x3 = bitmapPoints[4];
+            float y3 = bitmapPoints[5];
+            float x4 = bitmapPoints[6];
+            float y4 = bitmapPoints[7];
 
             if (showBorder) {
                 borderPaint.setColor(Color.BLACK);

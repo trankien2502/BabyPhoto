@@ -14,7 +14,7 @@ public class ZoomIconEvent implements StickerIconEvent {
 
   @Override
   public void onActionMove(StickerView stickerView, MotionEvent event) {
-    stickerView.zoomCurrentSticker(event);
+    stickerView.zoomAndRotateCurrentSticker(event);
   }
 
   @Override
