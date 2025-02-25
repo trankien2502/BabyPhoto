@@ -1,8 +1,14 @@
 package picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -11,7 +17,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.R;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ads.IsNetWork;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.api_data.CallApiUtils;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.base.BaseActivity;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.LoadingDialog;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.NoInternetDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.exit.ExitAppDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.exit.IClickDialogExit;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.rate.IClickDialogRate;
@@ -23,6 +33,7 @@ import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.materni
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.SPUtils;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.SharePrefUtils;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.databinding.ActivityHomeBinding;
+
 import com.google.android.gms.tasks.Task;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
@@ -40,6 +51,78 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
     private static final int STATE_HOME = 1;
     private static final int STATE_CREATION = 2;
     int state = 1;
+    boolean isCheckCallApi = false;
+    Handler handler = new Handler();
+    Runnable runnable;
+    NoInternetDialog dialog;
+
+    LoadingDialog loadingDialog;
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!IsNetWork.haveNetworkConnection(context)) {
+                showNoInternetDialog();
+            } else {
+                if (dialog != null && dialog.isShowing()) dialog.dismiss();
+                checkCallApi();
+            }
+        }
+    };
+
+    private void showNoInternetDialog() {
+        dialog = new NoInternetDialog(this, false);
+        dialog.binding.btnDeny.setOnClickListener(view -> {
+            dialog.dismiss();
+            setResult(RESULT_OK);
+            finish();
+        });
+        dialog.binding.btnAllow.setOnClickListener(view -> {
+//            AppOpenManager.getInstance().disableAppResumeWithActivity(CreateCatActivity.class);
+            Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+            startActivity(intent);
+            dialog.dismiss();
+        });
+        dialog.show();
+    }
+
+    private void showLoadingDialogEdit() {
+        loadingDialog = new LoadingDialog(this, false);
+        loadingDialog.show();
+    }
+
+    private void dismissLoadingDialogEdit() {
+        if (loadingDialog != null && loadingDialog.isShowing()) loadingDialog.dismiss();
+    }
+
+    private void checkCallApi() {
+        if (isCheckCallApi) return;
+        if (dialog != null) dialog.dismiss();
+        if (IsNetWork.haveNetworkConnection(this)) {
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (SPUtils.getBoolean(getBaseContext(), SPUtils.CALL_API_SUCCESS, false)) {
+                        handler.removeCallbacks(this);
+                        isCheckCallApi = true;
+                        changeState();
+                        dismissLoadingDialogEdit();
+                    } else {
+                        if (IsNetWork.haveNetworkConnection(getBaseContext()))
+                            handler.postDelayed(this, 100);
+                        else handler.removeCallbacks(this);
+                    }
+                }
+            };
+            showLoadingDialogEdit();
+            if (!SPUtils.getBoolean(getBaseContext(), SPUtils.CALL_API_SUCCESS, false)) {
+                CallApiUtils.callApi(getBaseContext());
+                handler.post(runnable);
+                Log.e("call_api_check", "start call api: ");
+            } else {
+                dismissLoadingDialogEdit();
+            }
+        }
+    }
 
     ArrayList<String> exitRate = new ArrayList<String>(Arrays.asList("2", "4", "6", "8", "10"));
 
@@ -62,6 +145,20 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(networkReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkReceiver, filter);
+        checkCallApi();
+    }
+
+    @Override
     public void bindView() {
         binding.ivSetting.setOnClickListener(view -> {
             startNextActivity(SettingActivity.class, null);
@@ -78,12 +175,14 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
 
     private void changeState() {
         if (state == STATE_HOME) {
+            binding.tvTitle.setText(R.string.capture_precious_moments);
             binding.ivHome.setImageResource(R.drawable.buildings_s);
             binding.tvHome.setTextColor(Color.parseColor("#064380"));
             binding.ivCreation.setImageResource(R.drawable.filled_sn);
             binding.tvCreation.setTextColor(Color.parseColor("#73808C"));
             replaceFragment(new HomeFragment());
         } else {
+            binding.tvTitle.setText(R.string.my_creation);
             binding.ivHome.setImageResource(R.drawable.buildings_sn);
             binding.tvHome.setTextColor(Color.parseColor("#73808C"));
             binding.ivCreation.setImageResource(R.drawable.filled_s);

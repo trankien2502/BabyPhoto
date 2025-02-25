@@ -5,15 +5,21 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
+import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.provider.Settings;
 import android.text.Layout;
 import android.util.Log;
 import android.util.Size;
@@ -34,9 +40,11 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.R;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ads.IsNetWork;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.api_data.ConstantApiData;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.base.BaseActivity;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.DrawableSticker;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.Effect;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.Sticker;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.StickerView;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.TextSticker;
@@ -46,10 +54,12 @@ import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.materni
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.database.icon.IconModel;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.databinding.ActivityEditBinding;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.BorderDialog;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.FilterDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.FontDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.FormatDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.FrameDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.LoadingDialog;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.NoInternetDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.OpacityDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.TextDialog;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.sticker.ClickStickerCallBack;
@@ -59,6 +69,9 @@ import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.materni
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.color.ColorAdapter;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.color.ColorClickCallBack;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.color.ColorModel;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.filter.FilterAdapter;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.filter.FilterClickCallBack;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.filter.FilterModel;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.font.FontAdapter;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.font.FontClickCallBack;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.font.FontModel;
@@ -85,6 +98,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
     Drawable drawable;
     boolean isAddPhoto = false;
     int state = 1;
+    IconModel frameCurrent = null;
     private static final int RESULT_CODE_CHANGE_PHOTO = 1234;
     private static final int RESULT_CODE_ADD_PHOTO = 5678;
     private static final int STATE_NONE = 0;
@@ -97,6 +111,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
 
     List<IconModel> listHolidayFrame = new ArrayList<>();
     List<ColorModel> listColor = new ArrayList<>();
+    List<FilterModel> listFilter = new ArrayList<>();
     List<FontModel> listFont = new ArrayList<>();
     List<IconModel> listMilestonesFrame = new ArrayList<>();
     List<IconModel> listAITrendFrame = new ArrayList<>();
@@ -117,16 +132,59 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
     List<IconModel> listHolidaySticker = new ArrayList<>();
     List<IconModel> listNewYear = new ArrayList<>();
 
+
     @Override
     public ActivityEditBinding getBinding() {
         return ActivityEditBinding.inflate(getLayoutInflater());
     }
+
+    NoInternetDialog dialog;
+
+    private void showNoInternetDialog() {
+        dialog = new NoInternetDialog(this, false);
+        dialog.binding.btnDeny.setOnClickListener(view -> {
+            dialog.dismiss();
+            setResult(RESULT_OK);
+            finish();
+        });
+        dialog.binding.btnAllow.setOnClickListener(view -> {
+//            AppOpenManager.getInstance().disableAppResumeWithActivity(CreateCatActivity.class);
+            Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+            startActivity(intent);
+            dialog.dismiss();
+        });
+        dialog.show();
+    }
+
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!IsNetWork.haveNetworkConnection(context)) {
+                showNoInternetDialog();
+            } else {
+                if (dialog != null && dialog.isShowing()) dialog.dismiss();
+            }
+        }
+    };
 
     private void hideOption() {
         if (binding.stickerView.getOnStickerOperationListener() != null) {
             binding.stickerView.getOnStickerOperationListener().onStickerHideOptionIcon();
         }
         binding.stickerView.unSelectStickerCurrent();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(networkReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkReceiver, filter);
     }
 
     @Override
@@ -142,8 +200,12 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             if (Objects.equals(iconModel.getCategory(), ConstantApiData.MILESTONES_DEMO))
                 category = ConstantApiData.MILESTONES;
             IconModel icon = IconDatabase.getInstance(this).iconDAO().getIconByCategoryAndSortASC(category, iconModel.getSortasc());
-            if (icon != null)
+            if (icon != null){
                 Glide.with(this).load(icon.getUrl()).into(binding.ivFrameEdit);
+                frameCurrent = icon;
+            }
+
+
             state = STATE_NONE;
             changeState();
         } else {
@@ -374,27 +436,10 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
         changeState();
     }
 
-    public Size getImageSizeFromUri(Uri uri) {
-        try {
-            ContentResolver contentResolver = getContentResolver();
-            InputStream inputStream = contentResolver.openInputStream(uri);
-
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(inputStream, null, options);
-            if (inputStream != null) {
-                inputStream.close();
-            }
-            return new Size(options.outWidth, options.outHeight);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public void bindView() {
-        binding.stickerPhoto.setOnClickListener(v -> {
-
+        binding.tvChange.setOnClickListener(view -> {
+            binding.ivFrameEdit.setAlpha(((float)binding.sbOpacityFrame.getProgress() / 255));
         });
         binding.ivBack.setOnClickListener(view -> {
             onBack();
@@ -448,8 +493,6 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             binding.stickerPhoto.invalidate();
         });
         binding.clFrame.setOnClickListener(view -> {
-            state = STATE_FRAME;
-            changeState();
             showFrameDialog();
         });
         binding.clText.setOnClickListener(view -> {
@@ -474,8 +517,6 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             showBackgroundDialog();
         });
         binding.clSticker.setOnClickListener(view -> {
-            state = STATE_STICKER;
-            changeState();
             showStickerDialog();
         });
         binding.llStickerRemove.setOnClickListener(view -> {
@@ -636,7 +677,30 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
         FormatDialog dialog = new FormatDialog(this, false);
         TextSticker sticker = (TextSticker) binding.stickerView.getCurrentSticker();
         if (sticker != null) {
-
+            final boolean[] isBold = {sticker.isBold()};
+            final boolean[] isItalic = {sticker.isItalic()};
+            final boolean[] isUnderLine = {sticker.isUnderLine()};
+            final boolean[] isLineCentral = {sticker.isLineCentral()};
+            final Layout.Alignment[] alignment = {sticker.getTextAlign()};
+            if (alignment[0] == Layout.Alignment.ALIGN_CENTER)
+                dialog.binding.ivCenter.setBackgroundResource(R.drawable.bg_edit_text);
+            else dialog.binding.ivCenter.setBackgroundResource(0);
+            if (alignment[0] == Layout.Alignment.ALIGN_OPPOSITE)
+                dialog.binding.ivOpposite.setBackgroundResource(R.drawable.bg_edit_text);
+            else dialog.binding.ivOpposite.setBackgroundResource(0);
+            if (alignment[0] == Layout.Alignment.ALIGN_NORMAL)
+                dialog.binding.ivStart.setBackgroundResource(R.drawable.bg_edit_text);
+            else dialog.binding.ivStart.setBackgroundResource(0);
+            if (isBold[0]) dialog.binding.ivBold.setBackgroundResource(R.drawable.bg_edit_text);
+            else dialog.binding.ivBold.setBackgroundResource(0);
+            if (isItalic[0]) dialog.binding.ivItalic.setBackgroundResource(R.drawable.bg_edit_text);
+            else dialog.binding.ivItalic.setBackgroundResource(0);
+            if (isUnderLine[0])
+                dialog.binding.ivUnderline.setBackgroundResource(R.drawable.bg_edit_text);
+            else dialog.binding.ivUnderline.setBackgroundResource(0);
+            if (isLineCentral[0])
+                dialog.binding.ivCross.setBackgroundResource(R.drawable.bg_edit_text);
+            else dialog.binding.ivCross.setBackgroundResource(0);
             final int[] color = {Color.BLACK};
             int position = 0;
             color[0] = sticker.getColorText();
@@ -660,46 +724,55 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                 if (binding.stickerView.getCurrentSticker() != null) {
                     ((TextSticker) binding.stickerView.getCurrentSticker()).setColorText(color[0]);
                     binding.stickerView.getCurrentSticker().setAlpha(dialog.binding.sbOpacity.getProgress());
+                    ((TextSticker) binding.stickerView.getCurrentSticker()).setBold(isBold[0]);
+                    ((TextSticker) binding.stickerView.getCurrentSticker()).setUnderLine(isUnderLine[0]);
+                    ((TextSticker) binding.stickerView.getCurrentSticker()).setItalic(isItalic[0]);
+                    ((TextSticker) binding.stickerView.getCurrentSticker()).setLineCentral(isLineCentral[0]);
+                    ((TextSticker) binding.stickerView.getCurrentSticker()).setTextAlign(alignment[0]);
                     binding.stickerView.invalidate();
                 }
                 dialog.dismiss();
             });
             dialog.binding.ivBold.setOnClickListener(v -> {
-                ((TextSticker) binding.stickerView.getCurrentSticker()).setBold(!((TextSticker) binding.stickerView.getCurrentSticker()).isBold());
+                isBold[0] = !isBold[0];
+                if (isBold[0]) dialog.binding.ivBold.setBackgroundResource(R.drawable.bg_edit_text);
+                else dialog.binding.ivBold.setBackgroundResource(0);
             });
             dialog.binding.ivItalic.setOnClickListener(v -> {
-                ((TextSticker) binding.stickerView.getCurrentSticker()).setItalic(!((TextSticker) binding.stickerView.getCurrentSticker()).isItalic());
+                isItalic[0] = !isItalic[0];
+                if (isItalic[0])
+                    dialog.binding.ivItalic.setBackgroundResource(R.drawable.bg_edit_text);
+                else dialog.binding.ivItalic.setBackgroundResource(0);
             });
             dialog.binding.ivCross.setOnClickListener(v -> {
-                ((TextSticker) binding.stickerView.getCurrentSticker()).setLineCentral(!((TextSticker) binding.stickerView.getCurrentSticker()).isLineCentral());
+                isLineCentral[0] = !isLineCentral[0];
+                if (isLineCentral[0])
+                    dialog.binding.ivCross.setBackgroundResource(R.drawable.bg_edit_text);
+                else dialog.binding.ivCross.setBackgroundResource(0);
             });
             dialog.binding.ivUnderline.setOnClickListener(v -> {
-                ((TextSticker) binding.stickerView.getCurrentSticker()).setUnderLine(!((TextSticker) binding.stickerView.getCurrentSticker()).isUnderLine());
+                isUnderLine[0] = !isUnderLine[0];
+                if (isUnderLine[0])
+                    dialog.binding.ivUnderline.setBackgroundResource(R.drawable.bg_edit_text);
+                else dialog.binding.ivUnderline.setBackgroundResource(0);
             });
             dialog.binding.ivStart.setOnClickListener(v -> {
-                ((TextSticker) binding.stickerView.getCurrentSticker()).setTextAlign(Layout.Alignment.ALIGN_NORMAL);
+                alignment[0] = Layout.Alignment.ALIGN_NORMAL;
+                dialog.binding.ivCenter.setBackgroundResource(0);
+                dialog.binding.ivOpposite.setBackgroundResource(0);
+                dialog.binding.ivStart.setBackgroundResource(R.drawable.bg_edit_text);
             });
             dialog.binding.ivCenter.setOnClickListener(v -> {
-                ((TextSticker) binding.stickerView.getCurrentSticker()).setTextAlign(Layout.Alignment.ALIGN_CENTER);
+                alignment[0] = Layout.Alignment.ALIGN_CENTER;
+                dialog.binding.ivCenter.setBackgroundResource(R.drawable.bg_edit_text);
+                dialog.binding.ivOpposite.setBackgroundResource(0);
+                dialog.binding.ivStart.setBackgroundResource(0);
             });
             dialog.binding.ivOpposite.setOnClickListener(v -> {
-                ((TextSticker) binding.stickerView.getCurrentSticker()).setTextAlign(Layout.Alignment.ALIGN_OPPOSITE);
-            });
-            dialog.binding.sbOpacity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
+                alignment[0] = Layout.Alignment.ALIGN_OPPOSITE;
+                dialog.binding.ivCenter.setBackgroundResource(0);
+                dialog.binding.ivOpposite.setBackgroundResource(R.drawable.bg_edit_text);
+                dialog.binding.ivStart.setBackgroundResource(0);
             });
             dialog.show();
             int finalPosition = position;
@@ -722,59 +795,46 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
         dialog.binding.iv1.setImageResource(R.drawable.design);
         dialog.binding.sbBorder.setMax(255);
         TextSticker sticker = (TextSticker) binding.stickerView.getCurrentSticker();
-        final int[] color = {Color.BLACK};
-        int position = 0;
         if (sticker != null) {
+            dialog.binding.sbBorder.setProgress(sticker.getAlphaShadow());
+            final int[] color = {Color.BLACK};
+            int position = 0;
             color[0] = sticker.getColorShadow();
             for (int i = 0; i < listColor.size(); i++) {
                 ColorModel colorModel = listColor.get(i);
                 colorModel.setSelect(colorModel.getColor() == color[0]);
                 if (colorModel.getColor() == color[0]) position = i;
             }
+            ColorAdapter colorAdapter = new ColorAdapter(this, listColor, new ColorClickCallBack() {
+                @Override
+                public void select(ColorModel colorModel) {
+                    color[0] = colorModel.getColor();
+                }
+            });
+            dialog.binding.ivBack.setOnClickListener(view -> {
+                dialog.dismiss();
+            });
+            dialog.binding.ivGone.setOnClickListener(view -> {
+                if (binding.stickerView.getCurrentSticker() != null) {
+                    ((TextSticker) binding.stickerView.getCurrentSticker()).setColorShadow(color[0]);
+                    ((TextSticker) binding.stickerView.getCurrentSticker()).setAlphaShadow(dialog.binding.sbBorder.getProgress());
+                    binding.stickerView.invalidate();
+                }
+                dialog.dismiss();
+            });
+            dialog.show();
+            int finalPosition = position;
+            dialog.binding.rcvColor.post(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.binding.rcvColor.setAdapter(colorAdapter);
+                    dialog.binding.rcvColor.smoothScrollToPosition(finalPosition);
+                }
+            });
+        } else {
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
         }
-        ColorAdapter colorAdapter = new ColorAdapter(this, listColor, new ColorClickCallBack() {
-            @Override
-            public void select(ColorModel colorModel) {
-                color[0] = colorModel.getColor();
-            }
-        });
 
-        dialog.binding.sbBorder.setProgress(sticker != null ? sticker.getAlphaBackground() : 0);
-        dialog.binding.ivBack.setOnClickListener(view -> {
-            dialog.dismiss();
-        });
-        dialog.binding.ivGone.setOnClickListener(view -> {
-            if (binding.stickerView.getCurrentSticker() != null) {
-                ((TextSticker) binding.stickerView.getCurrentSticker()).setColorShadow(color[0]);
-                binding.stickerView.invalidate();
-            }
-            dialog.dismiss();
-        });
-        dialog.binding.sbBorder.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-        dialog.show();
-        int finalPosition = position;
-        dialog.binding.rcvColor.post(new Runnable() {
-            @Override
-            public void run() {
-                dialog.binding.rcvColor.setAdapter(colorAdapter);
-                dialog.binding.rcvColor.smoothScrollToPosition(finalPosition);
-            }
-        });
     }
 
     private void showFontDialog() {
@@ -785,9 +845,13 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             int position = 0;
             font[0] = sticker.getTypeface();
             for (int i = 0; i < listFont.size(); i++) {
-                if (Objects.equals(font[0], listFont.get(i).getFontPath())) position = i;
+                if (Objects.equals(font[0], listFont.get(i).getFontPath())) {
+                    listFont.get(i).setSelect(true);
+                    position = i;
+                } else {
+                    listFont.get(i).setSelect(false);
+                }
             }
-
             FontAdapter fontAdapter = new FontAdapter(this, listFont, new FontClickCallBack() {
                 @Override
                 public void select(FontModel fontModel) {
@@ -995,7 +1059,6 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             if (!dialog.binding.edtText.getText().toString().trim().isEmpty()) {
                 TextSticker textSticker = new TextSticker(this)
                         .setText(dialog.binding.edtText.getText().toString().trim())
-                        .setAlpha(255)
                         .resizeText();
                 textSticker.setStickerType(Sticker.StickerType.TEXT);
                 binding.stickerView.addSticker(textSticker);
@@ -1009,36 +1072,46 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
     }
 
     private void showFilterDialog() {
-        OpacityDialog dialog = new OpacityDialog(this, false);
-        Sticker sticker = binding.stickerView.getCurrentSticker();
-        dialog.binding.sbOpacity.setProgress(sticker != null ? sticker.getAlpha() : 255);
-        dialog.binding.ivBack.setOnClickListener(view -> {
-            dialog.dismiss();
-        });
-        dialog.binding.ivGone.setOnClickListener(view -> {
-            if (binding.stickerView.getCurrentSticker() != null) {
-                binding.stickerView.getCurrentSticker().setAlpha(dialog.binding.sbOpacity.getProgress());
-                binding.stickerView.invalidate();
+        FilterDialog dialog = new FilterDialog(this, false);
+        DrawableSticker sticker = (DrawableSticker) binding.stickerView.getCurrentSticker();
+        if (sticker != null) {
+            final ColorMatrixColorFilter[] filter = {sticker.getFilter()};
+            int position = 0;
+            filter[0] = sticker.getFilter();
+            for (int i = 0; i < listFilter.size(); i++) {
+                FilterModel colorModel = listFilter.get(i);
+                colorModel.setSelect(colorModel.getFilter() == filter[0]);
+                if (colorModel.getFilter() == filter[0]) position = i;
             }
-            dialog.dismiss();
-        });
-        dialog.binding.sbOpacity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            FilterAdapter filterAdapter = new FilterAdapter(this, listFilter, new FilterClickCallBack() {
+                @Override
+                public void select(FilterModel filterModel) {
+                    filter[0] = filterModel.getFilter();
+                }
+            });
+            dialog.binding.ivBack.setOnClickListener(view -> {
+                dialog.dismiss();
+            });
+            dialog.binding.ivGone.setOnClickListener(view -> {
+                if (binding.stickerView.getCurrentSticker() != null) {
+                    ((DrawableSticker) binding.stickerView.getCurrentSticker()).setFilter(filter[0]);
+                    binding.stickerView.invalidate();
+                }
+                dialog.dismiss();
+            });
+            dialog.show();
+            int finalPosition = position;
+            dialog.binding.rcvFilter.post(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.binding.rcvFilter.setAdapter(filterAdapter);
+                    dialog.binding.rcvFilter.smoothScrollToPosition(finalPosition);
+                }
+            });
+        } else {
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+        }
 
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-        dialog.show();
     }
 
     private void showOpacityDialog() {
@@ -1076,43 +1149,54 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
 
     private void showFrameDialog() {
         FrameDialog frameDialog = new FrameDialog(this, false);
-        FrameAdapter frameAdapter = new FrameAdapter(this, listHolidayFrame, new IconClickCallBack() {
+        IconClickCallBack iconClickCallBack = null;
+        FrameAdapter frameAdapter = new FrameAdapter(this, listHolidayFrame, iconClickCallBack);
+        iconClickCallBack = new IconClickCallBack() {
             @Override
             public void select(IconModel iconModel) {
-                Glide.with(getBaseContext()).load(iconModel.getUrl()).into(binding.ivFrameEdit);
-                frameDialog.dismiss();
-                state = STATE_NONE;
-                changeState();
+                frameAdapter.setCheck(iconModel);
             }
-        });
-
+        };
+        frameAdapter.setIconClickCallBack(iconClickCallBack);
+        if (frameCurrent != null) frameAdapter.setCheck(frameCurrent);
         frameDialog.binding.ivBack.setOnClickListener(view -> {
             frameDialog.dismiss();
             state = STATE_NONE;
             changeState();
         });
         frameDialog.binding.ivGone.setOnClickListener(view -> {
-            state = STATE_NONE;
-            changeState();
-            frameDialog.dismiss();
+            IconModel current = frameAdapter.getCheck();
+            if (current != null) {
+                Glide.with(getBaseContext()).load(current.getUrl()).into(binding.ivFrameEdit);
+                frameCurrent = current;
+                frameDialog.dismiss();
+                state = STATE_FRAME;
+                changeState();
+            } else {
+                Toast.makeText(getBaseContext(), R.string.please_choose_a_frame_first, Toast.LENGTH_SHORT).show();
+            }
+
         });
         frameDialog.binding.tvAITrend.setOnClickListener(view -> {
             frameDialog.binding.tvAITrend.setBackgroundResource(R.drawable.bg_item_s);
             frameDialog.binding.tvHoliday.setBackgroundResource(R.drawable.bg_item_sn);
             frameDialog.binding.tvMilestones.setBackgroundResource(R.drawable.bg_item_sn);
             frameAdapter.setIconModelList(listAITrendFrame);
+            if (frameCurrent != null) frameAdapter.setCheck(frameCurrent);
         });
         frameDialog.binding.tvHoliday.setOnClickListener(view -> {
             frameDialog.binding.tvAITrend.setBackgroundResource(R.drawable.bg_item_sn);
             frameDialog.binding.tvHoliday.setBackgroundResource(R.drawable.bg_item_s);
             frameDialog.binding.tvMilestones.setBackgroundResource(R.drawable.bg_item_sn);
             frameAdapter.setIconModelList(listHolidayFrame);
+            if (frameCurrent != null) frameAdapter.setCheck(frameCurrent);
         });
         frameDialog.binding.tvMilestones.setOnClickListener(view -> {
             frameDialog.binding.tvAITrend.setBackgroundResource(R.drawable.bg_item_sn);
             frameDialog.binding.tvHoliday.setBackgroundResource(R.drawable.bg_item_sn);
             frameDialog.binding.tvMilestones.setBackgroundResource(R.drawable.bg_item_s);
             frameAdapter.setIconModelList(listMilestonesFrame);
+            if (frameCurrent != null) frameAdapter.setCheck(frameCurrent);
         });
         frameDialog.show();
         frameDialog.binding.rcvFrameList.post(new Runnable() {
@@ -1132,6 +1216,12 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                 loadImageFromURL(iconModel.getUrl());
                 frameDialog.dismiss();
             }
+        });
+        frameDialog.binding.ivBack.setOnClickListener(v -> {
+            frameDialog.dismiss();
+        });
+        frameDialog.binding.ivGone.setOnClickListener(v -> {
+            Toast.makeText(getBaseContext(), R.string.please_choose_a_sticker, Toast.LENGTH_SHORT).show();
         });
         frameDialog.init(new ClickStickerCallBack() {
             @Override
@@ -1238,6 +1328,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
 
         binding.hscrItem.setVisibility(VISIBLE);
         binding.scrBottom.setVisibility(VISIBLE);
+        binding.clOpacityFrame.setVisibility(INVISIBLE);
     }
 
     private void changeState() {
@@ -1251,6 +1342,8 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                 break;
             case STATE_FRAME:
                 binding.hscrItem.setVisibility(INVISIBLE);
+                binding.clOpacityFrame.setVisibility(VISIBLE);
+                binding.sbOpacityFrame.setProgress((int) (binding.ivFrameEdit.getAlpha() * 255));
                 binding.ivFrame.setImageResource(R.drawable.edit_frame_s);
                 break;
             case STATE_STICKER:
@@ -1303,6 +1396,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
         listSummer = IconDatabase.getInstance(this).iconDAO().getIconByCategory(ConstantApiData.SUMMER);
         listHolidaySticker = IconDatabase.getInstance(this).iconDAO().getIconByCategory(ConstantApiData.HOLIDAY_STICKER);
         listNewYear = IconDatabase.getInstance(this).iconDAO().getIconByCategory(ConstantApiData.NEW_YEAR);
+
         listColor.add(new ColorModel(Color.parseColor("#FFFFFF")));
         listColor.add(new ColorModel(Color.parseColor("#CCCCCC")));
         listColor.add(new ColorModel(Color.parseColor("#999999")));
@@ -1373,5 +1467,28 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
         listFont.add(new FontModel("font/ghochi_hand.ttf"));
         listFont.add(new FontModel("font/grand_hotel.ttf"));
         listFont.add(new FontModel("font/gurajada.ttf"));
+        listFilter.add(new FilterModel(Effect.getEffect0()));
+        listFilter.add(new FilterModel(Effect.getEffect1()));
+        listFilter.add(new FilterModel(Effect.getEffect2()));
+        listFilter.add(new FilterModel(Effect.getEffect3()));
+        listFilter.add(new FilterModel(Effect.getEffect4()));
+        listFilter.add(new FilterModel(Effect.getEffect5()));
+        listFilter.add(new FilterModel(Effect.getEffect6()));
+        listFilter.add(new FilterModel(Effect.getEffect7()));
+        listFilter.add(new FilterModel(Effect.getEffect8()));
+        listFilter.add(new FilterModel(Effect.getEffect9()));
+        listFilter.add(new FilterModel(Effect.getEffect10()));
+        listFilter.add(new FilterModel(Effect.getEffect11()));
+        listFilter.add(new FilterModel(Effect.getEffect12()));
+        listFilter.add(new FilterModel(Effect.getEffect13()));
+        listFilter.add(new FilterModel(Effect.getEffect14()));
+        listFilter.add(new FilterModel(Effect.getEffect15()));
+        listFilter.add(new FilterModel(Effect.getEffect16()));
+        listFilter.add(new FilterModel(Effect.getEffect17()));
+        listFilter.add(new FilterModel(Effect.getEffect18()));
+        listFilter.add(new FilterModel(Effect.getEffect19()));
+        listFilter.add(new FilterModel(Effect.getEffect20()));
+        listFilter.add(new FilterModel(Effect.getEffect21()));
+        listFilter.add(new FilterModel(Effect.getEffect22()));
     }
 }

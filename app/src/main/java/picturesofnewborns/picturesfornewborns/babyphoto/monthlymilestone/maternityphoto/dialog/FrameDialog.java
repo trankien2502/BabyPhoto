@@ -2,6 +2,7 @@ package picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.matern
 
 import android.content.Context;
 import android.view.Gravity;
+import android.view.ViewGroup;
 import android.view.Window;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ public class FrameDialog extends BaseDialog<DialogFrameBinding> {
         Window window = getWindow();
         if (window != null) {
             window.setGravity(Gravity.BOTTOM);
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
     }
 

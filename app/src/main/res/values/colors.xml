@@ -14,5 +14,5 @@
     <color name="text_select">#3bed6d</color>
     <color name="text_unselect">#bababa</color>
     <color name="main">#111827</color>
-
+    <color name="font_select">#E5F2FF</color>
 </resources>

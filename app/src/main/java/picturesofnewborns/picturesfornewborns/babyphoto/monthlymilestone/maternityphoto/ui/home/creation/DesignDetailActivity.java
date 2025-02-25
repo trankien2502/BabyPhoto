@@ -26,6 +26,7 @@ import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.materni
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.database.design.DesignModel;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.databinding.ActivityDesignDetailBinding;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog.DeleteDialog;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.crop.CropActivity;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.EventTracking;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.ImageUtils;
 
@@ -70,6 +71,9 @@ public class DesignDetailActivity extends BaseActivity<ActivityDesignDetailBindi
             EventTracking.logEvent(getBaseContext(), "album_my_design_item_view_delete_click");
             showDeleteDialog();
         });
+        binding.clCreateNew.setOnClickListener(v -> {
+            resultLauncher.launch(new Intent(this, CropActivity.class));
+        });
         binding.clDownload.setOnClickListener(view -> {
             EventTracking.logEvent(getBaseContext(), "album_my_design_item_view_download_click");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -109,6 +113,13 @@ public class DesignDetailActivity extends BaseActivity<ActivityDesignDetailBindi
         dialog.binding.btnAllow.setOnClickListener(view -> {
             dialog.dismiss();
             DesignDatabase.getInstance(this).designDAO().delete(designModel.getId());
+            File file = new File(designModel.getPath());
+            boolean deleted = file.delete();
+            if (deleted) {
+                Log.d("CacheCleanup", "File cache đã được xóa: " + designModel.getPath());
+            } else {
+                Log.e("CacheCleanup", "Xóa file cache thất bại");
+            }
             setResult(RESULT_OK);
             finish();
         });

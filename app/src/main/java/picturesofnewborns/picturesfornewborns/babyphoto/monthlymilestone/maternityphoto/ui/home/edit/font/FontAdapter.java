@@ -1,5 +1,8 @@
 package picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.font;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
@@ -13,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import java.util.Objects;
 
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.R;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.databinding.ItemFontBinding;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.color.ColorModel;
 
@@ -58,9 +62,13 @@ public class FontAdapter extends RecyclerView.Adapter<FontAdapter.IconViewHolder
     public void onBindViewHolder(@NonNull IconViewHolder holder, int position) {
         FontModel fontModel = listFont.get(position);
         Typeface typeface = Typeface.createFromAsset(context.getAssets(), fontModel.getFontPath());
-        if (fontModel.isSelect())
-            holder.binding.layoutItem.setBackgroundResource(Color.parseColor("#E5F2FF"));
-        else holder.binding.layoutItem.setBackgroundResource(0);
+        if (fontModel.isSelect()) {
+            holder.binding.layoutItem.setBackgroundResource(R.color.font_select);
+            holder.binding.ivSelect.setVisibility(VISIBLE);
+        } else {
+            holder.binding.layoutItem.setBackgroundResource(0);
+            holder.binding.ivSelect.setVisibility(INVISIBLE);
+        }
         holder.binding.tvFont.setTypeface(typeface);
         holder.binding.layoutItem.setOnClickListener(view -> {
             setCheck(fontModel);

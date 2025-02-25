@@ -7,6 +7,16 @@
     android:background="#00000000"
     tools:context="picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.creation.CreationFragment">
 
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcvDesign"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="2"
+        tools:listitem="@layout/item_design" />
     <LinearLayout
         android:id="@+id/llNoData"
         android:layout_width="wrap_content"
@@ -60,13 +70,4 @@
                 android:layout_marginStart="8dp"/>
         </LinearLayout>
     </LinearLayout>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rcvDesign"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="2"
-        tools:listitem="@layout/item_design" />
 </androidx.constraintlayout.widget.ConstraintLayout>

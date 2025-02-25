@@ -40,6 +40,7 @@ public class DesignAdapter extends RecyclerView.Adapter<DesignAdapter.DesignView
         if (bitmap != null)
             holder.binding.ivCat.setImageBitmap(bitmap);
         holder.binding.layoutItem.setOnClickListener(view -> clickDesignCallBack.select(designModel));
+        holder.binding.ivMore.setOnClickListener(v -> clickDesignCallBack.detail(designModel));
     }
 
     @Override

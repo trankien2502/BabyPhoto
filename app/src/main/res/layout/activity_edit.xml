@@ -32,11 +32,11 @@
             android:layout_marginHorizontal="12dp"
             android:fontFamily="@font/aeonik_pro_bold"
             android:gravity="center"
-            android:visibility="invisible"
             android:paddingHorizontal="4dp"
             android:text="@string/crop_image"
             android:textColor="@color/black"
             android:textSize="24sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tvSave"
             app:layout_constraintStart_toEndOf="@id/ivBack"
@@ -63,17 +63,19 @@
         android:id="@+id/preview"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="412:550"
         app:layout_constraintBottom_toTopOf="@id/hscrItem"
+        app:layout_constraintDimensionRatio="412:550"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/clHeader">
+
         <ImageView
             android:id="@+id/ivBaby"
-            android:src="@drawable/img_no_picture"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"/>
+            android:scaleType="fitXY"
+            android:src="@drawable/img_no_picture" />
+
         <picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.StickerView
             android:id="@+id/stickerPhoto"
             android:layout_width="match_parent"
@@ -84,11 +86,12 @@
             app:layout_constraintTop_toTopOf="parent"
             app:showBorder="false"
             app:showIcons="false" />
+
         <ImageView
             android:id="@+id/ivFrameEdit"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"/>
+            android:scaleType="fitXY" />
 
         <picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker.StickerView
             android:id="@+id/stickerView"
@@ -101,41 +104,97 @@
             app:layout_constraintTop_toTopOf="parent"
             app:showBorder="true"
             app:showIcons="true" />
+
         <LinearLayout
             android:id="@+id/llAddPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
             android:minWidth="48dp"
-            app:layout_constraintTop_toTopOf="parent"
+            android:minHeight="48dp"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:minHeight="48dp"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            app:layout_constraintTop_toTopOf="parent">
+
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/gallery_add"/>
+                android:src="@drawable/gallery_add" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#064380"
-                android:textSize="14sp"
+                android:layout_marginTop="2dp"
                 android:fontFamily="@font/aeonik_pro_regular"
                 android:includeFontPadding="false"
-                android:layout_marginTop="2dp"
-                android:text="@string/tap_to_add_photo"/>
+                android:text="@string/tap_to_add_photo"
+                android:textColor="#064380"
+                android:textSize="14sp" />
         </LinearLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clOpacityFrame"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="@id/hscrItem">
 
+        <ImageView
+            android:id="@+id/ivx"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/design"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <SeekBar
+            android:id="@+id/sbOpacityFrame"
+            android:layout_width="0dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:max="255"
+            android:paddingVertical="5dp"
+            android:progress="255"
+            android:progressDrawable="@drawable/bg_seekbar"
+            android:splitTrack="false"
+            android:thumb="@drawable/ellipse_5"
+            android:thumbTint="#000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tvChange"
+            app:layout_constraintStart_toEndOf="@id/ivx"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvChange"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/change"
+            android:fontFamily="@font/aeonik_pro_regular"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:minWidth="48dp"
+            android:paddingHorizontal="6dp"
+            android:text="@string/change"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <HorizontalScrollView
         android:id="@+id/hscrItem"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:background="#EFF7FF"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/scrBottom">
 
         <LinearLayout
@@ -654,9 +713,9 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-
-
     </HorizontalScrollView>
+
+
 
     <LinearLayout
         android:id="@+id/scrBottom"

@@ -1,6 +1,7 @@
 package picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker;
 
 import android.content.Context;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -34,10 +35,14 @@ public class TextSticker extends Sticker {
     private final Rect realBounds;
     private final Rect textRect;
     private final TextPaint textPaint;
+    private final TextPaint shadowPaint;
     private Drawable drawable;
     private StaticLayout staticLayout;
+    private StaticLayout staticShadowLayout;
     private Layout.Alignment alignment;
     private String text;
+
+    private int alphaShadow = 127;
 
     private int colorText = Color.BLACK;
     private int colorShadow = Color.BLACK;
@@ -78,15 +83,24 @@ public class TextSticker extends Sticker {
         if (drawable == null) {
             this.drawable = ContextCompat.getDrawable(context, R.drawable.sticker_transparent_background);
         }
-        textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
         realBounds = new Rect(0, 0, getWidth(), getHeight());
         textRect = new Rect(0, 0, getWidth(), getHeight());
-        minTextSizePixels = convertSpToPx(6);
-        maxTextSizePixels = convertSpToPx(32);
+        minTextSizePixels = convertSpToPx(10);
+        maxTextSizePixels = convertSpToPx(40);
         alignment = Layout.Alignment.ALIGN_CENTER;
+        textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
         textPaint.setTextSize(maxTextSizePixels);
         textPaint.setColor(colorText);
+        textPaint.setAlpha(127);
         textPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), typeface));
+
+        shadowPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+        shadowPaint.setTextSize(maxTextSizePixels);
+        shadowPaint.setColor(colorShadow);
+        shadowPaint.setAlpha(alphaShadow);
+        shadowPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), typeface));
+        BlurMaskFilter blurMaskFilter = new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL);
+        shadowPaint.setMaskFilter(blurMaskFilter);
     }
 
     @Override
@@ -98,6 +112,20 @@ public class TextSticker extends Sticker {
             drawable.setBounds(realBounds);
             drawable.draw(canvas);
         }
+        canvas.restore();
+
+        canvas.save();
+        canvas.concat(matrix);
+        if (textRect.width() == getWidth()) {
+            int dy = getHeight() / 2 - staticLayout.getHeight() / 2;
+            // center vertical
+            canvas.translate(5, dy + 5);
+        } else {
+            int dx = textRect.left;
+            int dy = textRect.top + textRect.height() / 2 - staticLayout.getHeight() / 2;
+            canvas.translate(dx + 5, dy + 5);
+        }
+        staticShadowLayout.draw(canvas);
         canvas.restore();
 
         canvas.save();
@@ -149,7 +177,7 @@ public class TextSticker extends Sticker {
 
     public TextSticker setColorShadow(int colorShadow) {
         this.colorShadow = colorShadow;
-        textPaint.setShadowLayer(10, 5, 5, colorShadow);
+        shadowPaint.setColor(colorShadow);
         return this;
     }
 
@@ -159,6 +187,7 @@ public class TextSticker extends Sticker {
 
     public TextSticker setTypeface(String typeface) {
         this.typeface = typeface;
+        shadowPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), typeface));
         textPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), typeface));
         return this;
     }
@@ -171,6 +200,8 @@ public class TextSticker extends Sticker {
         isUnderLine = underLine;
         if (isUnderLine) textPaint.setFlags(textPaint.getFlags() | Paint.UNDERLINE_TEXT_FLAG);
         else textPaint.setFlags(textPaint.getFlags() & ~Paint.UNDERLINE_TEXT_FLAG);
+        if (isUnderLine) shadowPaint.setFlags(shadowPaint.getFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        else shadowPaint.setFlags(shadowPaint.getFlags() & ~Paint.UNDERLINE_TEXT_FLAG);
         return this;
     }
 
@@ -182,6 +213,9 @@ public class TextSticker extends Sticker {
         isLineCentral = lineCentral;
         if (isLineCentral) textPaint.setFlags(textPaint.getFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         else textPaint.setFlags(textPaint.getFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+        if (isLineCentral)
+            shadowPaint.setFlags(shadowPaint.getFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        else shadowPaint.setFlags(shadowPaint.getFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
         return this;
     }
 
@@ -193,6 +227,8 @@ public class TextSticker extends Sticker {
         isItalic = italic;
         if (isItalic) textPaint.setTextSkewX(-0.25f);
         else textPaint.setTextSkewX(0);
+        if (isItalic) shadowPaint.setTextSkewX(-0.25f);
+        else shadowPaint.setTextSkewX(0);
         return this;
     }
 
@@ -203,6 +239,16 @@ public class TextSticker extends Sticker {
     public TextSticker setBold(boolean bold) {
         isBold = bold;
         textPaint.setFakeBoldText(isBold);
+        shadowPaint.setFakeBoldText(isBold);
+        return this;
+    }
+
+    public int getAlphaShadow() {
+        return shadowPaint.getAlpha();
+    }
+
+    public TextSticker setAlphaShadow(@IntRange(from = 0, to = 255) int alphaShadow) {
+        shadowPaint.setAlpha(alphaShadow);
         return this;
     }
 
@@ -248,6 +294,11 @@ public class TextSticker extends Sticker {
             textRect.set(region.left, region.top, region.right, region.bottom);
         }
         return this;
+    }
+
+    @NonNull
+    public Layout.Alignment getTextAlign() {
+        return alignment;
     }
 
     @NonNull
@@ -301,7 +352,7 @@ public class TextSticker extends Sticker {
     public TextSticker resizeText() {
         final int availableHeightPixels = textRect.height();
 
-        final int availableWidthPixels = textRect.width();
+        final int availableWidthPixels = (int) (textRect.width()-dpTOpx(10f));
 
         final CharSequence text = getText();
 
@@ -343,7 +394,6 @@ public class TextSticker extends Sticker {
             StaticLayout staticLayout =
                     new StaticLayout(text, textPaintCopy, availableWidthPixels, Layout.Alignment.ALIGN_NORMAL,
                             lineSpacingMultiplier, lineSpacingExtra, false);
-
             // Check that we have a least one line of rendered text
             if (staticLayout.getLineCount() > 0) {
                 // Since the line at the specific vertical position would be cut off,
@@ -368,12 +418,18 @@ public class TextSticker extends Sticker {
             }
         }
         textPaint.setTextSize(targetTextSizePixels);
+        shadowPaint.setTextSize(targetTextSizePixels);
         staticLayout =
                 new StaticLayout(this.text, textPaint, textRect.width(), alignment, lineSpacingMultiplier,
                         lineSpacingExtra, true);
+        staticShadowLayout =
+                new StaticLayout(this.text, shadowPaint, textRect.width(), alignment, lineSpacingMultiplier,
+                        lineSpacingExtra, true);
         return this;
     }
-
+    private float dpTOpx(float dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
+    }
     /**
      * @return lower text size limit, in pixels.
      */

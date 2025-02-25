@@ -26,6 +26,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/tvTitle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginHorizontal="24dp"
@@ -35,7 +36,7 @@
                 android:includeFontPadding="false"
                 android:lineSpacingExtra="-5dp"
                 android:lines="1"
-                android:text="@string/capture_precious_moments"
+                android:text="@string/my_creation"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 app:layout_constraintEnd_toStartOf="@id/ivSetting"

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,6 +46,10 @@ public class HomeFragment extends BaseFragment<FragmentHomeBinding> {
         listHoliday = IconDatabase.getInstance(requireContext()).iconDAO().getIconByCategory(ConstantApiData.HOLIDAY_DEMO);
         listMilestones = IconDatabase.getInstance(requireContext()).iconDAO().getIconByCategory(ConstantApiData.MILESTONES_DEMO);
         listAITrend = IconDatabase.getInstance(requireContext()).iconDAO().getIconByCategory(ConstantApiData.AI_TREND_DEMO);
+        listGeneral.addAll(listHoliday);
+        listGeneral.addAll(listMilestones);
+        listGeneral.addAll(listAITrend);
+        Collections.shuffle(listGeneral);
         iconAdapter = new IconAdapter(requireContext(), listHoliday, new IconClickCallBack() {
             @Override
             public void select(IconModel iconModel) {

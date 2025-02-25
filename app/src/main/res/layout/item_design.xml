@@ -37,6 +37,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
+        android:id="@+id/ivMore"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:padding="8dp"

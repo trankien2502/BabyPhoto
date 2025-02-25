@@ -5,4 +5,5 @@ import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.materni
 
 public interface ClickDesignCallBack {
     void select(DesignModel designModel);
+    void detail(DesignModel designModel);
 }

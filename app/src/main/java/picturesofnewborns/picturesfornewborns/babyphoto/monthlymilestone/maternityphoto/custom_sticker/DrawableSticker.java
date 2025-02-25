@@ -1,6 +1,7 @@
 package picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.custom_sticker;
 
 import android.graphics.Canvas;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 
@@ -15,6 +16,8 @@ public class DrawableSticker extends Sticker {
     private Drawable drawable;
     private Drawable originalDrawable;
 
+    private ColorMatrixColorFilter filter;
+
     private String drawablePath;
 
     private Rect realBounds;
@@ -22,6 +25,7 @@ public class DrawableSticker extends Sticker {
     public DrawableSticker(Drawable drawable2, String drawablePath) {
         this.drawable = drawable2;
         this.drawablePath = drawablePath;
+        filter = Effect.getEffect0();
         originalDrawable = drawable2.getConstantState().newDrawable().mutate();
         realBounds = new Rect(0, 0, getWidth(), getHeight());
         clearDirty();
@@ -59,8 +63,9 @@ public class DrawableSticker extends Sticker {
         canvas.concat(getMatrix());
         if (drawable != null) {
             drawable.setBounds(realBounds);
+            drawable.setColorFilter(filter);
+            drawable.draw(canvas);
         }
-        drawable.draw(canvas);
         canvas.restore();
         clearDirty();
     }
@@ -69,6 +74,15 @@ public class DrawableSticker extends Sticker {
     public DrawableSticker setAlpha(@IntRange(from = 0, to = 255) int alpha) {
         drawable.setAlpha(alpha);
         markAsDirty();
+        return this;
+    }
+
+    public ColorMatrixColorFilter getFilter() {
+        return filter;
+    }
+
+    public DrawableSticker setFilter(ColorMatrixColorFilter filter) {
+        this.filter = filter;
         return this;
     }
 

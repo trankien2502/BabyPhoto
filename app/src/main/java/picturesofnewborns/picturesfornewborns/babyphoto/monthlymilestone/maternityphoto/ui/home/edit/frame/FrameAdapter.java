@@ -19,6 +19,7 @@ import com.bumptech.glide.request.target.Target;
 import java.util.List;
 import java.util.Objects;
 
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.R;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.database.icon.IconModel;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.databinding.ItemFrameListBinding;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.databinding.ItemFrameListBinding;
@@ -64,9 +65,9 @@ public class FrameAdapter extends RecyclerView.Adapter<FrameAdapter.IconViewHold
     @Override
     public void onBindViewHolder(@NonNull IconViewHolder holder, int position) {
         IconModel iconModel = iconModelList.get(position);
-//        if (iconModel.isSelect())
-//            holder.binding.layoutItem.setBackgroundResource(R.drawable.bg_item_model_s);
-//        else holder.binding.layoutItem.setBackgroundResource(R.drawable.bg_item_model_sn);
+        if (iconModel.isSelect())
+            holder.binding.layoutItem.setBackgroundResource(R.drawable.bg_item_s);
+        else holder.binding.layoutItem.setBackgroundResource(R.drawable.bg_item_sn);
         if (!Objects.equals(iconModel.getUrl(), "") && iconModel.getUrl() != null)
             Glide.with(context).load(iconModel.getUrl()).listener(new RequestListener<Drawable>() {
                 @Override
@@ -94,6 +95,12 @@ public class FrameAdapter extends RecyclerView.Adapter<FrameAdapter.IconViewHold
             iconModel1.setSelect(Objects.equals(iconModel1.getUrl(), iconModel.getUrl()));
         }
         notifyDataSetChanged();
+    }
+    public IconModel getCheck() {
+        for (IconModel iconModel1 : iconModelList) {
+            if (iconModel1.isSelect()) return iconModel1;
+        }
+        return null;
     }
 
     @Override

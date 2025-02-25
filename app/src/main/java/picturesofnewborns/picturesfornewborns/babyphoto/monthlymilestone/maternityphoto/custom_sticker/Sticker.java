@@ -33,6 +33,7 @@ public abstract class Sticker {
         int RIGHT = 1 << 3;
         int BOTTOM = 1 << 4;
     }
+
     @IntDef(flag = true, value = {
             StickerType.STICKER, StickerType.PICTURE, StickerType.TEXT
     })
@@ -55,8 +56,8 @@ public abstract class Sticker {
     private boolean isLock;
     private int stickerType = StickerType.STICKER;
     private int colorBorder = Color.BLACK;
-    private int colorBackground =  Color.BLACK;
-    private int alphaBackground =  0;
+    private int colorBackground = Color.BLACK;
+    private int alphaBackground = 127;
     private int borderWidth = 0;
     private int pagerSelect;//pager : face, eyes...
     private int posSelect;// pos: vị trí chọn của list face(vd: face1, face2)
@@ -105,6 +106,7 @@ public abstract class Sticker {
         this.borderWidth = borderWidth;
         return this;
     }
+
     public int getStickerType() {
         return stickerType;
     }
@@ -113,6 +115,7 @@ public abstract class Sticker {
         this.stickerType = type;
         return this;
     }
+
     public int getColorBorder() {
         return colorBorder;
     }
@@ -121,6 +124,7 @@ public abstract class Sticker {
         this.colorBorder = colorBorder;
         return this;
     }
+
     public int getColorBackground() {
         return colorBackground;
     }
@@ -206,6 +210,7 @@ public abstract class Sticker {
 
     @NonNull
     public abstract Sticker setAlpha(@IntRange(from = 0, to = 255) int alpha);
+
     public abstract int getAlpha();
 
     public float[] getBoundPoints() {

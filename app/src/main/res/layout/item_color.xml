@@ -18,6 +18,11 @@
         app:riv_corner_radius="36dp" />
 
     <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_corner_color"
+        android:visibility="visible" />
+    <ImageView
         android:id="@+id/ivSelect"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

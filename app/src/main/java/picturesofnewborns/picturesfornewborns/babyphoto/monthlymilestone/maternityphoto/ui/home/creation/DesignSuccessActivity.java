@@ -25,6 +25,7 @@ import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.materni
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.base.BaseActivity;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.databinding.ActivityDesignSuccessBinding;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.HomeActivity;
+import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.crop.CropActivity;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.EventTracking;
 import picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.util.ImageUtils;
 
@@ -83,6 +84,9 @@ public class DesignSuccessActivity extends BaseActivity<ActivityDesignSuccessBin
     public void bindView() {
         binding.ivBack.setOnClickListener(view -> {
             onBack();
+        });
+        binding.clCreateNew.setOnClickListener(v -> {
+            resultLauncher.launch(new Intent(this, CropActivity.class));
         });
         binding.ivHome.setOnClickListener(view -> {
             EventTracking.logEvent(getBaseContext(), "success_home_click");
