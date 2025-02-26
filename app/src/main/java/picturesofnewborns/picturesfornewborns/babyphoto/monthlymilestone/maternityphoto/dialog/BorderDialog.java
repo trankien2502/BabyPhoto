@@ -1,8 +1,11 @@
 package picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.dialog;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 
@@ -30,6 +33,8 @@ public class BorderDialog extends BaseDialog<DialogBorderBinding> {
         Window window = getWindow();
         if (window != null) {
             window.setGravity(Gravity.BOTTOM);
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); // Xóa nền mờ
+            window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); // Không làm mờ nền
         }
     }
 
