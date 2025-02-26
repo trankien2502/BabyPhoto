@@ -200,7 +200,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
             if (Objects.equals(iconModel.getCategory(), ConstantApiData.MILESTONES_DEMO))
                 category = ConstantApiData.MILESTONES;
             IconModel icon = IconDatabase.getInstance(this).iconDAO().getIconByCategoryAndSortASC(category, iconModel.getSortasc());
-            if (icon != null){
+            if (icon != null) {
                 Glide.with(this).load(icon.getUrl()).into(binding.ivFrameEdit);
                 frameCurrent = icon;
             }
@@ -222,6 +222,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                                 drawable = resource;
                                 DrawableSticker drawableSticker = new DrawableSticker(drawable, "");
                                 binding.stickerPhoto.removeAllStickers();
+                                drawableSticker.setBorderWidth(0);
                                 binding.stickerPhoto.addSticker(drawableSticker);
                                 binding.llAddPhoto.setVisibility(GONE);
                                 binding.ivBaby.setVisibility(GONE);
@@ -438,8 +439,21 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
 
     @Override
     public void bindView() {
-        binding.tvChange.setOnClickListener(view -> {
-            binding.ivFrameEdit.setAlpha(((float)binding.sbOpacityFrame.getProgress() / 255));
+        binding.sbOpacityFrame.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                binding.ivFrameEdit.setAlpha(((float) binding.sbOpacityFrame.getProgress() / 255));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
         });
         binding.ivBack.setOnClickListener(view -> {
             onBack();
@@ -614,6 +628,7 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
                             drawable = resource;
                             DrawableSticker drawableSticker = new DrawableSticker(drawable, "");
                             binding.stickerPhoto.removeAllStickers();
+                            drawableSticker.setBorderWidth(0);
                             binding.stickerPhoto.addSticker(drawableSticker);
                             binding.llAddPhoto.setVisibility(GONE);
                             binding.ivBaby.setVisibility(GONE);
@@ -1057,9 +1072,10 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
         });
         dialog.binding.ivDone.setOnClickListener(view -> {
             if (!dialog.binding.edtText.getText().toString().trim().isEmpty()) {
-                TextSticker textSticker = new TextSticker(this)
+                TextSticker textSticker = (TextSticker) new TextSticker(this)
                         .setText(dialog.binding.edtText.getText().toString().trim())
-                        .resizeText();
+                        .resizeText()
+                        .setBorderWidth(0);
                 textSticker.setStickerType(Sticker.StickerType.TEXT);
                 binding.stickerView.addSticker(textSticker);
                 dialog.dismiss();
@@ -1149,15 +1165,12 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
 
     private void showFrameDialog() {
         FrameDialog frameDialog = new FrameDialog(this, false);
-        IconClickCallBack iconClickCallBack = null;
-        FrameAdapter frameAdapter = new FrameAdapter(this, listHolidayFrame, iconClickCallBack);
-        iconClickCallBack = new IconClickCallBack() {
+        FrameAdapter frameAdapter = new FrameAdapter(this, listHolidayFrame, new IconClickCallBack() {
             @Override
             public void select(IconModel iconModel) {
-                frameAdapter.setCheck(iconModel);
+
             }
-        };
-        frameAdapter.setIconClickCallBack(iconClickCallBack);
+        });
         if (frameCurrent != null) frameAdapter.setCheck(frameCurrent);
         frameDialog.binding.ivBack.setOnClickListener(view -> {
             frameDialog.dismiss();
@@ -1457,16 +1470,57 @@ public class EditActivity extends BaseActivity<ActivityEditBinding> {
         listColor.add(new ColorModel(Color.parseColor("#E500E5")));
         listColor.add(new ColorModel(Color.parseColor("#B200B2")));
         listColor.add(new ColorModel(Color.parseColor("#660066")));
+        listFont.add(new FontModel("font/fonts_01.ttf"));
+        listFont.add(new FontModel("font/fonts_02.ttf"));
+        listFont.add(new FontModel("font/fonts_03.ttf"));
+        listFont.add(new FontModel("font/fonts_04.ttf"));
+        listFont.add(new FontModel("font/fonts_05.ttf"));
+        listFont.add(new FontModel("font/fonts_06.ttf"));
+        listFont.add(new FontModel("font/fonts_07.ttf"));
+        listFont.add(new FontModel("font/fonts_08.ttf"));
+        listFont.add(new FontModel("font/fonts_09.ttf"));
+        listFont.add(new FontModel("font/fonts_10.ttf"));
+        listFont.add(new FontModel("font/fonts_11.ttf"));
+        listFont.add(new FontModel("font/fonts_12.ttf"));
+        listFont.add(new FontModel("font/fonts_13.ttf"));
+        listFont.add(new FontModel("font/fonts_14.ttf"));
+        listFont.add(new FontModel("font/fonts_15.ttf"));
+        listFont.add(new FontModel("font/fonts_16.ttf"));
+        listFont.add(new FontModel("font/fonts_17.ttf"));
+        listFont.add(new FontModel("font/fonts_18.ttf"));
+        listFont.add(new FontModel("font/fonts_19.ttf"));
+        listFont.add(new FontModel("font/fonts_20.ttf"));
+        listFont.add(new FontModel("font/fonts_21.ttf"));
+        listFont.add(new FontModel("font/fonts_22.ttf"));
+        listFont.add(new FontModel("font/fonts_23.ttf"));
+        listFont.add(new FontModel("font/fonts_24.ttf"));
+        listFont.add(new FontModel("font/fonts_25.ttf"));
+        listFont.add(new FontModel("font/fonts_26.ttf"));
+        listFont.add(new FontModel("font/fonts_27.ttf"));
+        listFont.add(new FontModel("font/fonts_28.ttf"));
+        listFont.add(new FontModel("font/fonts_29.ttf"));
+        listFont.add(new FontModel("font/fonts_30.ttf"));
+        listFont.add(new FontModel("font/fonts_31.ttf"));
+        listFont.add(new FontModel("font/fonts_32.ttf"));
+        listFont.add(new FontModel("font/fonts_33.ttf"));
+        listFont.add(new FontModel("font/fonts_34.ttf"));
+        listFont.add(new FontModel("font/fonts_35.ttf"));
+        listFont.add(new FontModel("font/fonts_36.ttf"));
+        listFont.add(new FontModel("font/fonts_37.ttf"));
+        listFont.add(new FontModel("font/fonts_38.ttf"));
+        listFont.add(new FontModel("font/fonts_39.ttf"));
+        listFont.add(new FontModel("font/fonts_40.ttf"));
+        listFont.add(new FontModel("font/fonts_41.ttf"));
+        listFont.add(new FontModel("font/fonts_42.ttf"));
+        listFont.add(new FontModel("font/fonts_43.ttf"));
+        listFont.add(new FontModel("font/fonts_44.ttf"));
+        listFont.add(new FontModel("font/fonts_45.ttf"));
+        listFont.add(new FontModel("font/fonts_46.ttf"));
+        listFont.add(new FontModel("font/fonts_47.ttf"));
+        listFont.add(new FontModel("font/fonts_48.ttf"));
+        listFont.add(new FontModel("font/fonts_49.ttf"));
+        listFont.add(new FontModel("font/fonts_50.ttf"));
         listFont.add(new FontModel("font/aeonik_pro_regular.otf"));
-        listFont.add(new FontModel("font/baloo2_edium.ttf"));
-        listFont.add(new FontModel("font/be_vietnam_pro.ttf"));
-        listFont.add(new FontModel("font/bowlby_one_sc.ttf"));
-        listFont.add(new FontModel("font/druk_text_wide_medium_trial.otf"));
-        listFont.add(new FontModel("font/galada.ttf"));
-        listFont.add(new FontModel("font/gamja_flower.ttf"));
-        listFont.add(new FontModel("font/ghochi_hand.ttf"));
-        listFont.add(new FontModel("font/grand_hotel.ttf"));
-        listFont.add(new FontModel("font/gurajada.ttf"));
         listFilter.add(new FilterModel(Effect.getEffect0()));
         listFilter.add(new FilterModel(Effect.getEffect1()));
         listFilter.add(new FilterModel(Effect.getEffect2()));

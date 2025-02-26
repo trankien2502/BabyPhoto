@@ -42,7 +42,7 @@ public class StickerView extends FrameLayout {
     private final boolean showIcons;
     private final boolean showBorder;
 
-//    private boolean s
+    //    private boolean s
     private final boolean bringToFrontCurrentSticker;
 
     @IntDef({
@@ -190,6 +190,7 @@ public class StickerView extends FrameLayout {
 //        }
 
     }
+
     public void configDefaultIconsInvisible(Context context) {
 //        for (Sticker sticker : stickers) {
 //            Log.d("checkDragCurrent", "3,matrix: " + sticker.getMatrix().toString());
@@ -301,17 +302,17 @@ public class StickerView extends FrameLayout {
                     path.lineTo(x4, y4);
                     path.lineTo(x3, y3);
                     path.close();
-                    if (sticker.getStickerType()== Sticker.StickerType.TEXT){
+                    if (sticker.getStickerType() == Sticker.StickerType.TEXT && sticker.getColorBackground() != Color.TRANSPARENT) {
                         backgoundPaint.setStyle(Paint.Style.FILL);
                         backgoundPaint.setColor(sticker.getColorBackground());
                         backgoundPaint.setAlpha(sticker.getAlphaBackground());
                         canvas.drawPath(path, backgoundPaint);
                     }
-                    if (sticker.getStickerType()== Sticker.StickerType.TEXT){
+                    if (sticker.getStickerType() == Sticker.StickerType.TEXT) {
                         ((TextSticker) sticker).resizeText();
                     }
                     sticker.draw(canvas);
-                    if (sticker.getBorderWidth()!=0){
+                    if (sticker.getBorderWidth() != 0) {
                         borderPicturePaint.setStyle(Paint.Style.STROKE);
                         borderPicturePaint.setColor(sticker.getColorBorder());
                         borderPicturePaint.setAlpha(sticker.getAlpha());
@@ -1069,7 +1070,7 @@ public class StickerView extends FrameLayout {
 
         sticker.getMatrix()
                 .postScale(scaleFactor / 2, scaleFactor / 2, getWidth() / 2, getHeight() / 2);
-
+        if (sticker.getStickerType() != Sticker.StickerType.PICTURE) sticker.setBorderWidth(0);
         handlingSticker = sticker;
         stickers.add(sticker);
 

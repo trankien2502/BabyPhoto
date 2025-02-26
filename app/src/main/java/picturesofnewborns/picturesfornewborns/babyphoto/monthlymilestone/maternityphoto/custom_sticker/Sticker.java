@@ -56,9 +56,9 @@ public abstract class Sticker {
     private boolean isLock;
     private int stickerType = StickerType.STICKER;
     private int colorBorder = Color.BLACK;
-    private int colorBackground = Color.BLACK;
+    private int colorBackground = Color.TRANSPARENT;
     private int alphaBackground = 127;
-    private int borderWidth = 0;
+    private int borderWidth = 4;
     private int pagerSelect;//pager : face, eyes...
     private int posSelect;// pos: vị trí chọn của list face(vd: face1, face2)
 

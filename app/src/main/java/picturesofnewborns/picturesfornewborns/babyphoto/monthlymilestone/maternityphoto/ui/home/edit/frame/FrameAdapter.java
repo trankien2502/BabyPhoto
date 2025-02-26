@@ -1,5 +1,8 @@
 package picturesofnewborns.picturesfornewborns.babyphoto.monthlymilestone.maternityphoto.ui.home.edit.frame;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -66,25 +69,25 @@ public class FrameAdapter extends RecyclerView.Adapter<FrameAdapter.IconViewHold
     public void onBindViewHolder(@NonNull IconViewHolder holder, int position) {
         IconModel iconModel = iconModelList.get(position);
         if (iconModel.isSelect())
-            holder.binding.layoutItem.setBackgroundResource(R.drawable.bg_item_s);
-        else holder.binding.layoutItem.setBackgroundResource(R.drawable.bg_item_sn);
+            holder.binding.ivSelect.setVisibility(VISIBLE);
+        else holder.binding.ivSelect.setVisibility(GONE);
         if (!Objects.equals(iconModel.getUrl(), "") && iconModel.getUrl() != null)
             Glide.with(context).load(iconModel.getUrl()).listener(new RequestListener<Drawable>() {
                 @Override
                 public boolean onLoadFailed(GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                    holder.binding.progress.setVisibility(View.GONE);
+                    holder.binding.progress.setVisibility(GONE);
                     return false;
                 }
 
                 @Override
                 public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                    holder.binding.progress.setVisibility(View.GONE);
+                    holder.binding.progress.setVisibility(GONE);
                     return false;
                 }
             }).into(holder.binding.ivItemModel);
-        else holder.binding.progress.setVisibility(View.GONE);
+        else holder.binding.progress.setVisibility(GONE);
         holder.binding.layoutItem.setOnClickListener(view -> {
-//            setCheck(iconModel);
+            setCheck(iconModel);
             iconClickCallBack.select(iconModel);
         });
     }

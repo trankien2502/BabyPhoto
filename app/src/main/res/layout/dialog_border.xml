@@ -53,7 +53,7 @@
             android:layout_height="18dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:max="7"
+            android:max="8"
             android:paddingVertical="5dp"
             android:progress="0"
             android:progressDrawable="@drawable/bg_seekbar"

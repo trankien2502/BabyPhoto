@@ -181,6 +181,7 @@
             android:gravity="center"
             android:includeFontPadding="false"
             android:minWidth="48dp"
+            android:visibility="gone"
             android:paddingHorizontal="6dp"
             android:text="@string/change"
             android:textColor="@color/black"

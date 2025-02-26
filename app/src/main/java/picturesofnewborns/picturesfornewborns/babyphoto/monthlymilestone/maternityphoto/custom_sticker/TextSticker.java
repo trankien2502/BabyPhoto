@@ -91,7 +91,7 @@ public class TextSticker extends Sticker {
         textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
         textPaint.setTextSize(maxTextSizePixels);
         textPaint.setColor(colorText);
-        textPaint.setAlpha(127);
+        textPaint.setAlpha(255);
         textPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), typeface));
 
         shadowPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);

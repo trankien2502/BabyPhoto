@@ -114,7 +114,7 @@
     <string name="are_you_sure_you_want_to_delete_this_photo">Are you sure you want to delete this photo?</string>
     <string name="failed_to_get_image">Failed to get image!</string>
     <string name="view">View</string>
-    <string name="download">Download\n</string>
+    <string name="download">Download</string>
     <string name="result">Result</string>
     <string name="enter_text">Enter text</string>
     <string name="please_entry_text">Please entry text!</string>

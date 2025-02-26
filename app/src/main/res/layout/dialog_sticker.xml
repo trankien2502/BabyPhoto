@@ -52,7 +52,7 @@
             android:layout_marginEnd="12dp"
             android:padding="4dp"
             android:src="@drawable/tick_round_2"
-            android:visibility="visible"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
